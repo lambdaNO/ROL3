@@ -1,0 +1,586 @@
+###############################################################################
+#################### Prise de notes distanciel RO #############################
+###############################################################################
+
+Lancement du programme depuis un terminal
+> E131729J@I121V7pc11:~/L3/6S/RO/TP0$ julia
+///////////////////////////////////////////////////////////////////////////////
+Pour charger le contenu d’un fichier nomfichier.jl, il suffit de taper
+julia > include(”nomfichier.jl”)
+///////////////////////////////////////////////////////////////////////////////
+Installation des packages depuis Julia :
+      # JuMP : Julia for Mathematical optimization (JuMP is a domain-specific modeling language for mathematical optimization embedded in Julia.)
+
+      julia> Pkg.add("JuMP")
+
+      # GLPK : le solveur pour la programmation linéaire en variables entières
+
+      julia> Pkg.add("GLPK")
+
+      # GLPKMathProgInterface : Pour pouvoir utiliser GLPK avec JuMP
+
+      julia> Pkg.add("GLPKMathProgInterface")
+
+///////////////////////////////////////////////////////////////////////////////
+Programme linéaire que l'on va modéliser avec JUMP
+
+max z = 15 x1 + 60 x2 + 4 x3 + 20 x4
+s.c.
+20 x1 + 20 x2 + 10 x3 + 40 x4 ≤ 21
+10 x1 + 30 x2 + 20 x3         ≤ 6
+20 x1 + 40 x2 + 30 x3 + 10 x4 ≤ 14
+x1 , x2 , x3 , x4 ≥ 0
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Le choix du solveur (pour GLPK) dépend du type des variables
+Dès qu’une variable n’est pas continue, GLPKSolverLP() doit être remplacé par GLPKSolverMIP()
+RAPPEL de moralité :
+    Problème en variable discrète : GLPKSolverMIP()
+    Problème en variable continue : GLPKSolverLP()
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+[ATTENTION]
+Avant de commencer, spécifier les packages dont on a besoin
+
+julia> using JuMP, GLPKMathProgInterface
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Déclaration d'un modèle explicite :
+
+Etape 0 : Déclaration des programmes que l'on va utiliser :
+
+julia> using JuMP, GLPKMathProgInterface
+INFO: Precompiling module JuMP.
+INFO: Precompiling module GLPK.
+
+Etape 1 : Déclaration d'un modèle vide - Spécification du solveur que l'on souhaite utiliser :
+
+julia> m = Model(solver = GLPKSolverLP())
+Feasibility problem with:
+ * 0 linear constraints
+ * 0 variables
+Solver is GLPKInterfaceLP
+
+Etape 2 : déclaration des variables de décisions associées à ce modèle
+Attention : Il faut spécifier la non négativité des variables.
+Structure : @variable(<nom_du_mdl>,<nom_de_la_var> >= 0)
+
+julia> @variable(m,x1 >= 0)
+x1
+
+julia> @variable(m,x2 >= 0)
+x2
+
+julia> @variable(m,x2 >= 0)
+WARNING: A variable or constraint named x2 is already attached to this model. If creating variables programmatically, use the anonymous variable syntax x = @variable(m, [1:N], ...).
+x2
+
+julia> @variable(m,x3 >= 0)
+x3
+
+julia> @variable(m,x4 >= 0)
+x4
+
+Etape 3 : déclaration de la fonction objectif (avec le type d'optimisation min/Max)
+Attention : les variables de décisions doivent être déclarée à l'étape 2
+Structure : @objective(<nom_du_mdl>, <type_opti>,<fct_var_décision>)
+<type_opti> = {Min,Max}
+
+
+julia> @objective(m, Max, 15x1 + 60x2 + 4x3 + 20x4)
+15 x1 + 60 x2 + 4 x3 + 20 x4
+
+Etape 4 : Déclaration des contraintes du modèle
+Note : Nom de la contrainte facultatif mais potentiellement utile pour la suite.
+Structure @constraint(<nom_du_mdl>, <nom_de_ctr>, <fct_contrainte>)
+<op_fct_contrainte> = {<=, <, ==, >, >=}
+
+julia> @constraint(m, Toxine1, 20x1 + 20x2 + 10x3 + 40x4 <= 21)
+20 x1 + 20 x2 + 10 x3 + 40 x4 ≤ 21
+
+julia> @constraint(m, Toxine2, 10x1 + 30x2 + 20x3 <= 6)
+10 x1 + 30 x2 + 20 x3 ≤ 6
+
+julia> @constraint(m, Toxine3, 20x1 + 40x2 + 30x3 + 10x4 <= 14)
+20 x1 + 40 x2 + 30 x3 + 10 x4 ≤ 14
+
+
+Etape 5 : Résolution du modèle
+Structure : status = solve (<nom_du_mdl>)
+Note : Résultats possibles
+    :Optimal = Problème résolu à l’optimalité
+    :Unbounded =  Problème non-borné
+    :Infeasible = Problème impossible
+    :Error = Sortie avec une erreur
+
+
+julia> status = solve(m)
+:Optimal
+
+Pour obtenir le résultat de la fonction objectif résolue à l'optimalité : getobjectivevalue(<nom_du_mdl>)
+
+julia> getobjectivevalue(m)
+20.5
+
+
+Pour obtenir le résultat des variables de décision pour le problème résolu à l'optimalité : getvalue(<nom_de_la_var>)
+julia> getvalue(x1)
+0.0
+
+julia> getvalue(x2)
+0.2
+
+julia> getvalue(x3)
+0.0
+
+julia> getvalue(x4)
+0.425
+
+Vérification à la main au cas où 15*0 + 0.2*60 + 4*0.0 + 20*0.425 = 20.5
+
+Remarque sur l'étape 2 :
+
+Les variables sont par défaut continues et libres. Possibilité de spécifier des.bornes inférieures et/ou supérieures
+pour une variable x :
+  @variable(m,x)
+  @variable(m, x >= lb)
+  @variable(m, x <= ub)
+  @variable(m, lb <= x <= ub)
+
+  Pour définir les lower bound (lb) et upper bound (ub), il suffit d'écrire :
+
+  julia> lb = 4
+  4
+  Et il les garde en mémoire - Par exemple si on rappe
+  julia> lb
+  4
+
+Lors de la déclaration de variable, on peut rajouter un troisième paramètre pour spécifier le type de la variable :
+Structure : @variable(<nom_du_mdl>,<nom_de_la_var> >= 0,<type_de_la_var>)
+<type_de_la_var> = {Int, Bin}
+  Int : pour une variable entière
+  Bin : pour une variable binaire
+
+
+Les symboles que l'on peut utiliser pour les comparaisons :
+  <op_fct_contrainte> = {<=, <, ==, >, >=}
+  - <= inférieur ou égal
+  - < inférieur strict
+  - == contrainte d'égalité [Attention]
+  - > supérieur strict
+  - >= supérieur ou égal
+
+RAPPEL de moralité :
+    Problème en variable discrète : GLPKSolverMIP()
+    Problème en variable continue : GLPKSolverLP()
+
+Petit plus : Déclaration d'une fonction d'affichage spécifique pour ce modèle - Mais là c'est inutile en fait
+julia> function imprim(m,x1,x2,x3,x4)
+       if status == :Optimal
+           println("Problème résolu à l'optimalité")
+
+           println("z = ",getobjectivevalue(m)) # affichage de la valeur optimale
+
+           println("x1 = ",getvalue(x1))
+           println("x2 = ",getvalue(x2))
+           println("x3 = ",getvalue(x3))
+           println("x4 = ",getvalue(x4)) # affichage des valeurs des variables
+
+       elseif status == :Unbounded
+           println("Problème non-borné")
+
+       elseif status == :Infeasible
+           println("Problème impossible")
+       end
+       end
+imprim (generic function with 1 method)
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Moralité de fin :
+julia> using JuMP, GLPKMathProgInterface
+
+julia> m = Model(solver = GLPKSolverLP())
+Feasibility problem with:
+ * 0 linear constraints
+ * 0 variables
+Solver is GLPKInterfaceLP
+julia> @variable(m,x1 >= 0)
+x1
+julia> @variable(m,x2 >= 0)
+x2
+julia> @variable(m,x3 >= 0)
+x3
+julia> @variable(m,x4 >= 0)
+x4
+julia> @objective(m, Max, 15x1 + 60x2 + 4x3 + 20x4)
+15 x1 + 60 x2 + 4 x3 + 20 x4
+julia> @constraint(m, Toxine1, 20x1 + 20x2 + 10x3 + 40x4 <=21)
+20 x1 + 20 x2 + 10 x3 + 40 x4 ≤ 21
+julia> @constraint(m, Toxine2, 10x1 + 30x2 + 20x3 <= 6)
+10 x1 + 30 x2 + 20 x3 ≤ 6
+julia> @constraint(m, Toxine3, 20x1 + 40x2 + 30x3 + 10x4 <= 14)
+20 x1 + 40 x2 + 30 x3 + 10 x4 ≤ 14
+julia> status = solve(m)
+:Optimal
+julia> imprim(m,x1,x2,x3,x4)
+Problème résolu à l'optimalité
+z = 20.5
+x1 = 0.0
+x2 = 0.2
+x3 = 0.0
+x4 = 0.425
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Motivation pour la création d'un  modèle implicite - Déclaration d'un modèle semi implicite
+
+Etape 0 : On déclare les packages dont on a besoin
+julia > using JuMP, GLPKMathProgInterface
+
+Dans le cas où l'on a plusieurs instances numériques : il ne faut pas écrire de modèle explicite pour résoudre chaque instance.
+Nécessité de séparer les éléments le modèle (Vecteurs, Matrices, ...)
+=> On parle de modèle implicite.
+
+Etape 1 : On repart d'un modèle vide :
+
+julia> m = Model(solver = GLPKSolverLP())
+Feasibility problem with:
+ * 0 linear constraints
+ * 0 variables
+Solver is GLPKInterfaceLP
+
+Etape 2 : Déclaration d'un tableau de variable (de décisions) -
+Vecteur nommé x à 4 composantes; ces dernières sont toutes supérieures ou égale à 0;
+
+julia> @variable(m,x[1:4] >= 0)
+4-element Array{JuMP.Variable,1}:
+ x[1]
+ x[2]
+ x[3]
+ x[4]
+
+[Note : ] - Début note
+Les tableaux de variables reposent sur une syntaxe différente des tableaux en Julia On ne spécifie pas la taille mais un ensemble d’indices
+
+Les indices peuvent être négatifs :
+    julia> @variable(m,y[-3:3] >= 0)
+    y[i] ≥ 0 ∀ i ∈ {-3,-2,…,2,3}
+
+Les indices peuvent ne pas être entiers :
+  julia> @variable(m,ville["Nantes","Vertou","Rezé"] >= 0)
+  ville[i,j,k] ≥ 0 ∀ i ∈ {N,a,…,e,s}, j ∈ {V,e,…,o,u}, k ∈ {R,e,z,é}
+
+  julia> @variable(m,v["A","B","C"] >= 0)
+  v[i,j,k] ≥ 0 ∀ i ∈ {A}, j ∈ {B}, k ∈ {C}
+
+  julia> v
+  v[i,j,k] ≥ 0 ∀ i ∈ {A}, j ∈ {B}, k ∈ {C}
+
+  julia> ville
+  ville[i,j,k] ≥ 0 ∀ i ∈ {N,a,…,e,s}, j ∈ {V,e,…,o,u}, k ∈ {R,e,z,é}
+
+  julia> m
+Feasibility problem with:
+ * 0 linear constraints
+ * 145 variables
+Solver is GLPKInterfaceLP
+
+[Note : ] - Fin note
+
+
+
+[Reprise :]
+
+Etape 0 : On déclare les packages dont on a besoin
+julia > using JuMP, GLPKMathProgInterface
+
+Etape 1 : On repart d'un modèle vide :
+julia> m = Model(solver = GLPKSolverLP())
+Feasibility problem with:
+ * 0 linear constraints
+ * 0 variables
+Solver is GLPKInterfaceLP
+
+Etape 2 : On déclare un tableau contenant les variables de décisions
+julia> @variable(m,x[1:4] >= 0)
+4-element Array{JuMP.Variable,1}:
+ x[1]
+ x[2]
+ x[3]
+ x[4]
+
+Etape 2 - Bis : On regarde quel est l'état du modèle
+julia> m
+Feasibility problem with:
+ * 0 linear constraints
+ * 4 variables
+Solver is GLPKInterfaceLP
+
+Etape 3 : On déclare la fonction objectif
+[Attention] Dans le cadre de la déclaration d'un modèle implicite, on accède directent aux éléments du vecteur x par indexation x[...]
+
+julia> @objective(m, Max, 15x[1] + 60x[2] + 4x[3] + 20x[4])
+15 x[1] + 60 x[2] + 4 x[3] + 20 x[4]
+
+julia> m
+Maximization problem with:
+ * 0 linear constraints
+ * 4 variables
+Solver is GLPKInterfaceLP
+
+Etape 4 : On déclare les fonctions contraintes
+[Attention] Dans le cadre de la déclaration d'un modèle implicite, on accède directent aux éléments du vecteur x par indexation x[...]
+
+julia> @constraint(m, Toxine1, 20x[1] + 20x[2] + 10x[3] + 40x[4] <= 21)
+20 x[1] + 20 x[2] + 10 x[3] + 40 x[4] ≤ 21
+
+julia> @constraint(m, Toxine2, 10x[1] + 30x[2] + 20x[3] <= 6)
+10 x[1] + 30 x[2] + 20 x[3] ≤ 6
+
+julia> @constraint(m, Toxine3, 20x[1] + 40x[2] + 30x[3] + 10x[4] <= 14)
+20 x[1] + 40 x[2] + 30 x[3] + 10 x[4] ≤ 14
+
+julia> m
+Maximization problem with:
+ * 3 linear constraints
+ * 4 variables
+Solver is GLPKInterfaceLP
+
+Etape 5 : On solve le problème :
+
+julia> status = solve(m)
+:Optimal
+
+Etape 6 : On récupère les valeurs à l'optimum
+    - Des variables de décisions (qui sont stockées dans un vecteur x - On a pas plus besoin de faire du cas par cas comme dans la résolution explicite)
+
+julia> getvalue(x)
+4-element Array{Float64,1}:
+ 0.0
+ 0.2
+ 0.0
+ 0.425
+
+    - De la fonction objectif :
+
+ julia> getobjectivevalue(m)
+ 20.5
+
+ Etape 7 : On bidouille une fonction d'affichage un peu plus smart que dans le cas du modèle explicite
+
+ julia> function impri(m)
+       if status == :Optimal
+           println("Problème résolu à l'optimalité")
+
+           println("z = ",getobjectivevalue(m)) # affichage de la valeur optimale
+
+           println("x = ",getvalue(x)) # affichage des valeurs du vecteur de variables
+
+       elseif status == :Unbounded
+           println("Problème non-borné")
+
+       elseif status == :Infeasible
+           println("Problème impossible")
+       end
+       end
+impri (generic function with 1 method)
+
+julia> impri(m)
+Problème résolu à l'optimalité
+z = 20.5
+x = [0.0, 0.2, 0.0, 0.425]
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Déclaration d'un modèle implicite
+
+L'objectif est de pouvoir définir un modèle réutilisable avec d'autres valeurs (par exemple d'autre les mêmes toxines mais avec de nouveaux chiffres).
+Le modèle implicite permet de créer des PL génériques dans une certaines mesures.
+On va déclarer une fonction qui va permettre de modéliser ce PL.
+On se rapproche au mieux de la représentation algébrique d'un système d'équations à plusieurs inconnues : A * X = Y;
+
+On va donc déclarer fonction retournant un modèle dépendant de données en entrée (on parle de modélisation implicite car les données sont séparées)
+    * c représente le vecteur des coefficients de la fonction objectif - Un vecteur (matrice de dim 1) - c::Vector{Int}
+    * A représente la matrice des contraintes - Une matrice (matrice de dim 2) - A::Array{Int,2}
+    * b représente les membres de droite des contraintes - Un vecteur (matrice de dim 1) b::Vector{Int}
+    * solverSelected est un paramètre permettant de choisir le solveur utilisé pour résoudre le problème =#
+
+Ils sont logiques dans Julia
+    Un vecteur est un Vector{<type>}
+    Une matrice est un tableau Array{<type>,<dim>}
+
+Le typage se fait faire de la manière suivante :
+    <nom_de_la_var>::<type>
+
+La boucle *pour* est minimale et se met en fin de déclaration des contrainte/fonction objectif
+
+Cette fois-ci, on est content d'avoir pris de bonne pratiques et on nomme bien ses contraintes avec des noms différents
+
+Détails sur les objets utilisés dans la fonction
+
+Le modele est cette fois declare dans une fonction dont les parametres specifient :
+  - le solveur utilise solverSelected
+  - le vecteur de coûts c::Vector{Int}
+  - la matrice des contraintes A::Array{Int,2}
+  - le vecteur des membres de droite des contraintes b::Vector{In}t
+=> Le modele construit sera ainsi independant des donnees et de leur taille (nombre de medicaments et de toxines)
+Declaration d'un modele initialement vide
+=> Attention au types d'objets que l'on souhaite passer en paramètre {Float64, Int, ...}
+=> Attention au solveur que l'on va utiliser (pour des variables discrètes(GLPKInterfaceMIP)/continues(GLPKInterfaceLP))
+    m = Model(solver = solverSelected)
+Deduction de la taille du probleme (nombre de variables et nombre de contraintes) des donnees
+    nbcontr, nbvar = size(A) / ou nbcontr = size(A,1) nbvar = size(A,2)
+Declaration d'un tableau de variables (ATTENTION au tupe de variable rien{float}/bin/int)
+    @variable(m,x[1:nbvar] >= 0)
+Declaration de la fonction objectif
+    @objective(m, Max, sum(c[j]x[j] for j in 1:nbvar))
+Declaration des contraintes ATTENTION : au type {<,<=,==,>=,>}
+  @constraint(m, Toxine[i=1:nbcontr], sum(A[i,j]x[j] for j in 1:nbvar) <= b[i])
+-> Une contrainte est generée pour chaque i dans [1:nbcontr]
+-> i est fixe dans chaque contrainte
+Le modele complete est simplement retourne en fin de fonction
+
+Etape 1 : Déclaration des fonctions
+
+function modelImplicite(solverSelected, c::Vector{Int}, A::Array{Int,2},b::Vector{Int})
+        # Déclaration d'un modèle (initialement vide)
+        # solverSelected est passé en paramètre car c'est à l'utilisateur de choisir le bon Solver (Variables Discrètes ou continues)
+        m = Model(solver = solverSelected)
+
+        # Déduction du nombre de variables et du nombre de contraintes à partir des données
+        nbcontr = size(A,1) # taille de la matrice A sur la première dimension = nombre de lignes de A
+        println("Nombre de contraintes (ie nb de lignes de A) : ",nbcontr)
+        nbvar = size(A,2) # taille de la matrice A sur la deuxième dimension = nombre de colonnes de A
+        println("Nombre de variable de décisions (ie nombre de colonnes de A) : ",nbvar)
+        #= Alternative possible (une fonction en Julia peut retourner plusieurs valeurs)
+        nbcontr, nbvar = size(A) =#
+
+        # Déclaration des variables de décision - un vecteur x composé de nbVar valeur x_1 à x_nbVar
+        @variable(m,x[1:nbvar] >= 0)
+
+        # Déclaration de la fonction objectif (avec le sens d'optimisation (Min,Max))
+        #
+        @objective(m, Max, sum(c[j]x[j] for j in 1:nbvar))
+
+        # Déclaration des contraintes
+        # (leur donner un nom est ici obligatoire pour grouper des contraintes en une seule déclaration)
+        @constraint(m, Toxine[i=1:nbcontr], sum(A[i,j]x[j] for j in 1:nbvar) <= b[i])
+        # Valeur retournée
+        return m
+    end
+
+On déclare en même temps la fonction d'affichage
+
+function imprimante(m)
+    if status == :Optimal
+        println("Problème résolu à l'optimalité")
+
+        println("z = ",getobjectivevalue(m)) # affichage de la valeur optimale
+
+        println("x = ",getvalue(m[:x])) # affichage des valeurs du vecteur de variables
+
+    elseif status == :Unbounded
+        println("Problème non-borné")
+
+    elseif status == :Infeasible
+        println("Problème impossible")
+    end
+end
+
+
+Etape 2 : Déclaration des données
+
+On peut maintenant déclarer les composantes de notre problème d'optimisation :
+On le rappelle au cas où :
+
+max z = 15 x1 + 60 x2 + 4 x3 + 20 x4
+s.c.
+20 x1 + 20 x2 + 10 x3 + 40 x4 ≤ 21
+10 x1 + 30 x2 + 20 x3         ≤ 6
+20 x1 + 40 x2 + 30 x3 + 10 x4 ≤ 14
+x1 , x2 , x3 , x4 ≥ 0
+
+
+Le modèle s'exprime alors comme :
+max (z) = c
+s.c.
+A * x {<,<=,==,>=,>} b
+
+Etape 2 - A : coefficients de la fonction objectif
+Attention à la syntaxe pour les vecteurs
+    - "," est le séparateur de valeurs
+
+c = [15,60,4,20]
+
+Etape 2 - B : coefficients de la matrice de contrainte
+
+Attention à la syntaxe pour les matrices
+    - " " est le séparateur de valeurs
+    - ";" est le séparateur de lignes
+
+A = [20 20 10 40;
+     10 30 20 0;
+     20 40 30 10]
+
+Etape 2 - C : membre droite des contraintes
+
+b = [21,6,14]
+
+
+
+julia> c = [15,60,4,20]
+4-element Array{Int64,1}:
+ 15
+ 60
+  4
+ 20
+
+julia> A = [20 20 10 40;
+            10 30 20 0;
+            20 40 30 10]
+3×4 Array{Int64,2}:
+ 20  20  10  40
+ 10  30  20   0
+ 20  40  30  10
+
+julia> b = [21,6,14]
+3-element Array{Int64,1}:
+ 21
+  6
+ 14
+
+Note : Julia comprend tout objet par défaut comme des tableaux (Array); le typage (vector/array) doit se faire lors de l'appel à la fonction.
+
+Etape 3 : Déclaration du nouveau modèle avec la fonction que l'on vient de créer
+
+julia> m = modelImplicite(GLPKSolverLP(),c,A,b)
+Nombre de contraintes (ie nb de lignes de A) : 3
+Nombre de variable de décisions (ie nombre de colonnes de A) : 4
+Maximization problem with:
+ * 3 linear constraints
+ * 4 variables
+Solver is GLPKInterfaceLP
+
+
+Etape 4 : Résolution du problème d'optimisation
+
+status = solve(m)
+
+Etape 5 : Affichage des résultats
+
+julia> imprimante(m)
+Problème résolu à l'optimalité
+z = 20.5
+x = [0.0, 0.2, 0.0, 0.425]
