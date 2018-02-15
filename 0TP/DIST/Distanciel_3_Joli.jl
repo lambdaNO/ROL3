@@ -34,14 +34,25 @@ function imp(m)
         println("Problème impossible")
     end
 end
+
+function imp_matrice(x)
+    nbcol = size(x,1)
+    nblig = size(x,2)
+    println("Colonnes : ", nbcol," - ", " Lignes : ", nblig)
+
+end
+
 # Déclaration des données
 # - coefficients fonction objectif :
 c = [12,20]
+imp_matrice(c)
 # - Matrice des contraintes
 A = [0.2 0.4;
     0.2 0.6]
+imp_matrice(A)
 # - Membres droits des contraintes
 b = [400,800]
+imp_matrice(b)
 # Déclaration du PL (à l'aide de la fonction)
 m = modelImplicite(GLPKSolverMIP(),c,A,b)
 # Resolution du PL
