@@ -38,8 +38,10 @@ end
 function imp(m)
     if status == :Optimal
         println("Problème résolu à l'optimalité")
-        println("z = ",getobjectivevalue(m)) # affichage de la valeur optimale
-        println("x = ",getvalue(m[:x])) # affichage des valeurs du vecteur de variables
+        println("z = ",getobjectivevalue(m)," €") # affichage de la valeur optimale
+        println("x = ",getvalue(m[:x])) # affichage des valeurs du vecteur de variables - Heures de production normales
+        println("y = ",getvalue(m[:y])) # affichage des valeurs du vecteur de variables - Heures de production supplémentaires
+        println("s = ",getvalue(m[:s])) # affichage des valeurs du vecteur de variables - Quantités en stock
     elseif status == :Unbounded
         println("Problème non-borné")
     elseif status == :Infeasible
