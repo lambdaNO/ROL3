@@ -1,21 +1,3 @@
-#=
-L’entreprise DeRoo fabrique des bicyclettes pour enfants. Les prévisions de ventes en milliers d’unités pour l’année
-à venir sont données dans le tableau ci-dessous. La capacité de production de l’entreprise est de 30 000 bicyclettes
-par mois. Elle peut produire plus en faisant faire des heures supplémentaires à ses employés. Mais le coût de revient
-d’une bicyclette est alors plus élevé : 30 € au lieu de 20 €.
-Janv : 30 ; Fév : 15 ; Mars : 15 ; Avril : 25 ; Mai : 33 ; Juin : 40 ; Juil : 45 ; Août : 45 ; Sept : 26 ; Oct : 14 ; Nov : 25 ; Déc : 30
-
-Actuellement, il y a 2000 bicyclettes en stock. On peut calculer les coûts de stockage en considérant un coût de
-3 € par unité contenue dans le stock en fin de mois. On considère que les capacités de stockage de l’entreprise sont
-illimitées. Nous sommes le premier janvier. Quelles quantités doivent être fabriquées et stockées dans les douze
-prochains mois, de façon à respecter les demandes prévisionnelles tout en minimisant les coûts ? Poser le problème
-sous la forme d’un Programme Linéaire.
-
-
-On travaille sur des unités (vélo). On doit donc charger le solver en variables entières GLPKSolverMIP
-=#
-#///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-# Déclaration des packages utilisés
 using JuMP, GLPKMathProgInterface
 # Déclaration d'un mdoèle vide :
 m = Model(solver = GLPKSolverMIP())
