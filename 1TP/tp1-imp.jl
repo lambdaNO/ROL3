@@ -1,3 +1,7 @@
+# LATIF Mehdi
+# TP1
+
+
 #=
 Exercice entreprise Deroo - Version implicite du solver PL
 Intérêt - Définition d'une production par récurrence
@@ -12,36 +16,31 @@ Attention - Nécessite d'ajouter un indice 0
 
 =#
 using JuMP, GLPKMathProgInterface
+function modelImplicite(solverSelected, Dem::Vector{Int},StockIni::Int,Kpa::Int,PNorm::Int,PSup::Int,PStock::Int)
 
-############## A REVOIR
-
-#=
-function modelImplicite(solverSelected, c::Vector{Int}, Sinit::Int,KpaNorm::Int,b::Vector{Int}, k::Int)
     m = Model(solver = solverSelected)
-    nbctr = length(b)
-    println("Nombre de contrainte : ", nbctr)
-    println("Constante multiplicative : ", k)
-    @variable(m,x[1:nbctr]>= 0,Int)
-    @variable(m,y[1:nbctr]>= 0,Int)
-    # Attention a bien mettre une case supplémentaire pour initialiser le stock initial
-    @variable(m,s[0:nbctr]>= 0,Int)
-
-    @objective(m,Min, sum(c[1]*x[i]for i in 1:nbctr)+sum(c[2]*y[i]for i in 1:nbctr)+sum(c[3]*s[i]for i in 0:nbctr))
-    @constraint(m,Kpa,x.<= (KpaNorm * k))
-    @constraint(m,StockIni,s[0]==Sinit * k)
-    @constraint(m,Gnrl[i=1:nbctr],(x[i]+y[i]+s[i-1]-s[i]== k * d[i]))
+    nbMois = size(Dem,1)
+    # Quantités à produire - Variables de décisions
+    @variable(m,QNorm[1:nbMois]>=0,Int)
+    @variable(m,QSup[1:nbMois]>=0,Int)
+    @variable(m,QStock[0:nbMois]>=0,Int)
+    # Fonction objectif
+    @objective(m,Min, sum(PNorm*QNorm[i] for i in 1:nbMois)+sum(PSup*QSup[i] for i in 1:nbMois)+sum(PStock*QStock[i] for i in 0:nbMois))
+    # Déclaration des contraintes
+    @constraint(m,CtrKpa[i=1:nbMois],QNorm[i]<= Kpa)
+    @constraint(m,CtrSI,QStock[0]==StockIni)
+    @constraint(m,CtrProd[i=1:nbMois],(QNorm[i]+QSup[i]+QStock[i-1]== Dem[i] + QStock[i]))
 
     return m
 end
 
-
 function imp(m)
     if status == :Optimal
         println("Problème résolu à l'optimalité")
-        println("z = ",getobjectivevalue(m)," €") # affichage de la valeur optimale
-        println("x = ",getvalue(m[:x])) # affichage des valeurs du vecteur de variables - Heures de production normales
-        println("y = ",getvalue(m[:y])) # affichage des valeurs du vecteur de variables - Heures de production supplémentaires
-        println("s = ",getvalue(m[:s])) # affichage des valeurs du vecteur de variables - Quantités en stock
+        println("Recette de l'année = ",getobjectivevalue(m)," €") # affichage de la valeur optimale
+        println("Quantité de vélos produits en Heures Normales = ",getvalue(m[:QNorm])) # affichage des valeurs du vecteur de variables - Heures de production normales
+        println("Quantité de vélos produits en Heures Sup = ",getvalue(m[:QSup])) # affichage des valeurs du vecteur de variables - Heures de production supplémentaires
+        println("Quantité de vélos stockés = ",getvalue(m[:QStock])) # affichage des valeurs du vecteur de variables - Quantités en stock
     elseif status == :Unbounded
         println("Problème non-borné")
     elseif status == :Infeasible
@@ -49,18 +48,22 @@ function imp(m)
     end
 end
 
+################################################################################
+# Cout de revient d'un vélo en heure normale
+PNorm = 20
+# Cout de revient d'un vélo en heure sup
+PSup = 30
+# Cout de stockage
+PStock = 3
+# Capacité de stockage
+Kpa = 30000
+# Stock initial - Mois 0
+StockIni = 2000
+#Demande en K-Unité
+d = 1000*[30,15,15,25,33,40,45,45,26,14,25,30]
+###############################################################################
+# function modelImplicite(solverSelected, Dem::Vector{Int},StockIni::Int,Kpa::Int,PNorm::Int,PSup::Int,PStock::Int)
 
-# Constante multiplicative
-k = 1000
-#  Membre droit des contraintes - Déclaration demande en K-Unité
-d = [30,15,15,25,33,40,45,45,26,14,25,30]
-# Capacité de production en H Normale - en K-Unité
-KpaNorm = 30
-# Stock initial - en K-Unité
-Sinit = 2
-# Coefficients de la fonction objectifs
-c = [20,30,3]
-
-m = modelImplicite(GLPKSolverMIP(),c,Sinit,KpaNorm,d,k)
+m = modelImplicite(GLPKSolverMIP(),d,StockIni,Kpa,PNorm,PSup,PStock)
+status = solve(m)
 imp(m)
-=#
