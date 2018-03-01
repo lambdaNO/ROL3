@@ -1,0 +1,443 @@
+## Note de distanciel 2
+
+
+Afin de protéger les salles d’un musée, il a été décidé de placer des caméras de surveillance au dessus du linteau de certaines des portes donnant accès aux salles d’exposition. Chaque caméra a été installée dans une alvéole aménagée à cet effet de manière à balayer les 2 salles reliées par la porte grâce à un double objectif. Le but de la direction était d’assurer, au moindre coût, que chaque salle soit placée sous l’oeil d’au moins une caméra. Le plan
+de ce musée est présenté ci-dessous. Les portes sont indiquées par les lettres B à R.
+Combien de caméras a-t-il fallu utiliser pour parvenir avec le moins de caméras possible, à surveiller chaque salle avec au moins une caméra tout en plaçant la salle 4 sous l’oeil d’au moins deux caméras ? Poser ce problème sous la forme d’un Programme Linéaire.
+
+Dans ce problème, nous avons posé la variable de décision :
+x_i = 1 si la caméra est sur la porte i
+x_i = 0 sinon
+
+\min (z) = \sum_{j=B}^{R}x_j\\
+x_{B} + x_{F} + x_{E} \geq 1\\
+x_{B} + x_{C} + x_{D} \geq 1\\
+x_{D} + x_{H} + x_{I} \geq 1\\
+x_{E} + x_{G} + x_{L} + x_{M} \geq 2\\
+x_{C} + x_{F} + x_{G} + x_{H} + x_{J} + x_{K} \geq 1\\
+x_{I} + x_{J} + x_{P} \geq 1\\
+x_{M} + x_{N} \geq 1\\
+x_{K} + x_{L} + x_{N} + x_{O} + x_{R}\geq 1\\
+x_{O}+ x_{P} +x_{Q} \geq 1\\
+x_{Q} + x_{R} \geq 1 \\
+x_{i}\geq 0\textrm{ } \forall i \in \{B,\dots,R\}
+
+Une matrice étant nécessairement indicée par des entiers en Julia, nous réindexons initialement les variables (caméra B d'indice 1 - Caméra R d'indice 17)
+
+Elements qui diffèrent par rapport aux modèles que l'on a défini précédemment :
+    > Les variables x_i sont binaires (ie x_i \in {0,1})
+@variable(m, x[1:nbCam], Bin)
+    > Les coefficients de la fonctions objectif sont supposés être égaux à 1
+V = [1 for i in 1:length(I)]
+Ou
+V = ones(Int,lenght(I))
+    > Les contraintes sont de type \geq b_i (supérieures ou égales à)
+@constraint(m, Salle[i=1:nbSalles], sum(A[i,j]x[j] for j in findn(A[i,:])) >= b[i])
+
+
+La déclaration de la matrice des contraintes pour un tel problème se ferai comme ça :
+A = [1 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0;
+1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+0 0 1 0 0 0 1 1 0 0 0 0 0 0 0 0 0;
+0 0 0 1 0 1 0 0 0 0 1 1 0 0 0 0 0;
+0 1 0 0 1 1 1 0 1 1 0 0 0 0 0 0 0;
+0 0 0 0 0 0 0 1 1 0 0 0 0 0 1 0 0;
+0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 0 0;
+0 0 0 0 0 0 0 0 0 1 1 0 1 1 0 0 1;
+0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0;
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1]
+
+C'est très moche :
+> Données peu lisibles, malgré la petite taille du problème
+> Matrice des contraintes composée essentiellement de 0
+(Phénomène courant en optimisation combinatoire)
+
+Moralité : utilisation d'une matrice creuse
+
+En julia, une matrice creuse se représente de la manière suivante : SparseMatrixCSC{Int64,Int64}
+
+Différence dans les contraintes
+sum(A[i,j]x[j] for j in 1:nbCam) >= b[i]
+devient
+sum(A[i,j]x[j] for j in findn(A[i,:])) >= b[i])
+
+@constraint(m, Salle[i=1:nbSalles], sum(A[i,j]x[j] for j in 1:nbCam) >= b[i])
+Devient
+ @constraint(m, Salle[i=1:nbSalles], sum(A[i,j]x[j] for j in findn(A[i,:])) >= b[i])
+# Alternative (quand on sait d'avance que les valeurs de la matrice creuse sont des 1)
+# @constraint(m, Salle[i=1:nbSalles], sum(x[j] for j in findn(A[i,:])) >= b[i])
+
+
+
+Utilisation de la notation matricielle pour accéder à la i-ème ligne de A (un vecteur creux)
+Utilisation de la fonction findn pour accéder aux indices significatifs du vecteur creux
+
+
+SAISIE D'UNE MATRICE CREUSE
+
+Premiere version porn trash :
+Passer la matrice A telle quelle et la transformer en matrice creuse par la suite à l'aide de la fonction sparse
+julia> A = [1 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0;
+            1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+            0 0 1 0 0 0 1 1 0 0 0 0 0 0 0 0 0;
+            0 0 0 1 0 1 0 0 0 0 1 1 0 0 0 0 0;
+            0 1 0 0 1 1 1 0 1 1 0 0 0 0 0 0 0;
+            0 0 0 0 0 0 0 1 1 0 0 0 0 0 1 0 0;
+            0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 0 0;
+            0 0 0 0 0 0 0 0 0 1 1 0 1 1 0 0 1;
+            0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0;
+            0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1]
+10×17 Array{Int64,2}:
+ 1  0  0  1  1  0  0  0  0  0  0  0  0  0  0  0  0
+ 1  1  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+ 0  0  1  0  0  0  1  1  0  0  0  0  0  0  0  0  0
+ 0  0  0  1  0  1  0  0  0  0  1  1  0  0  0  0  0
+ 0  1  0  0  1  1  1  0  1  1  0  0  0  0  0  0  0
+ 0  0  0  0  0  0  0  1  1  0  0  0  0  0  1  0  0
+ 0  0  0  0  0  0  0  0  0  0  0  1  1  0  0  0  0
+ 0  0  0  0  0  0  0  0  0  1  1  0  1  1  0  0  1
+ 0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  0
+ 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1
+
+julia> S = sparse(A)
+10×17 SparseMatrixCSC{Int64,Int64} with 34 stored entries:
+  [1 ,  1]  =  1
+  [2 ,  1]  =  1
+  [2 ,  2]  =  1
+  [5 ,  2]  =  1
+  [2 ,  3]  =  1
+  [3 ,  3]  =  1
+  [1 ,  4]  =  1
+  ⋮
+  [8 , 14]  =  1
+  [9 , 14]  =  1
+  [6 , 15]  =  1
+  [9 , 15]  =  1
+  [9 , 16]  =  1
+  [10, 16]  =  1
+  [8 , 17]  =  1
+  [10, 17]  =  1
+
+
+Deuxième version smart :
+La saisie d'une matrice creuse passe par le remplissage de 3 tableaux -
+Saisie directe d'une matrice creuse, en indiquant les indices des valeurs différentes de 0, puis les valeurs
+
+  I : indique la ligne de chaque element signicatif de la matrice creuse
+  J : indique la colonne de chaque element signicatif de la matrice creuse
+  V : indique la valeur de chaque element signicatif de la matrice creuse
+
+Il y a un 1 a la position (1,1)
+I = [1
+J = [1
+V = [1
+
+Il y a un 1 a la position (1,1)
+Il y a un 1 a la position (1,4)
+I = [1,1
+J = [1,4
+V = [1,1
+
+Il y a un 1 a la position (1,1)
+Il y a un 1 a la position (1,4)
+Il y a un 1 a la position (1,5)
+
+I = [1,1,1
+J = [1,4,5
+V = [1,1,1
+
+Il y a un 1 a la position (1,1)
+Il y a un 1 a la position (1,4)
+Il y a un 1 a la position (1,5)
+Il y a un 1 a la position (2,1)
+
+I = [1,1,1,2
+J = [1,4,5,1
+V = [1,1,1,1
+
+Moralité : M(I,J) = V avec I, l'indice des lignes; J, l'indice des colonnes
+
+
+L'exemple complet :
+
+I = [1, 1, 1,
+     2, 2, 2,
+     3, 3, 3,
+     4, 4, 4, 4,
+     5, 5, 5, 5, 5, 5,
+     6, 6, 6,
+     7, 7,
+     8, 8, 8, 8, 8,
+     9, 9, 9,
+     10, 10]
+J = [1, 4, 5,
+     1, 2, 3,
+     3, 7, 8,
+     4, 6, 11, 12,
+     2, 5, 6, 7, 9, 10,
+     8, 9, 15,
+     12, 13,
+     10, 11, 13, 14, 17,
+     14, 15, 16,
+     16, 17]
+
+Astuce : On est sur une matrice creuse composée de variable binaire x_i. On peut donc créer un vecteur composé que de 1.
+Pour se faire, on peut utiliser les deux commandes suivantes :
+V = [1 for i in 1:length(I)]
+Ou
+V = ones(Int,lenght(I))
+
+Attention : on sera pas forcément sur des matrices carrées. Faire gaffe au nombre de 1 à mettre (souvent celui de l'indice des lignes)
+
+Maintenant que l'on a les trois informations sur la matrices creuse (I,J,V), on peut la créer à l'aide de la fonction sparse()
+
+julia> A = sparse(I,J,V)
+10×17 SparseMatrixCSC{Int64,Int64} with 34 stored entries:
+  [1 ,  1]  =  1
+  [2 ,  1]  =  1
+  [2 ,  2]  =  1
+  [5 ,  2]  =  1
+  [2 ,  3]  =  1
+  [3 ,  3]  =  1
+  [1 ,  4]  =  1
+  [4 ,  4]  =  1
+  [1 ,  5]  =  1
+  [5 ,  5]  =  1
+  [4 ,  6]  =  1
+  [5 ,  6]  =  1
+  [3 ,  7]  =  1
+  [5 ,  7]  =  1
+  [3 ,  8]  =  1
+  [6 ,  8]  =  1
+  [5 ,  9]  =  1
+  [6 ,  9]  =  1
+  [5 , 10]  =  1
+  [8 , 10]  =  1
+  [4 , 11]  =  1
+  [8 , 11]  =  1
+  [4 , 12]  =  1
+  [7 , 12]  =  1
+  [7 , 13]  =  1
+  [8 , 13]  =  1
+  [8 , 14]  =  1
+  [9 , 14]  =  1
+  [6 , 15]  =  1
+  [9 , 15]  =  1
+  [9 , 16]  =  1
+  [10, 16]  =  1
+  [8 , 17]  =  1
+  [10, 17]  =  1
+
+
+Mais ce n'est pas suffisant car :
+> Les elements signicatifs de la matrice creuse sont tries par valeur croissante de l'indice de la colonne, puis par valeur croissante de l'indice de la ligne
+> Un acces direct a une colonne de la matrice creuse est prevu, mais pas a un acces a une ligne !
+Consequence : l'acces a une ligne de la matrice creuse demande (dans le pire cas) un parcours complet de chaque colonne !
+Proposition : remplacer l'utilisation d'une matrice creuse par un vecteurs de vecteurs ... Mais faut connaitre le nombre de caméra qu'on veut placer ...
+
+Afin de s'assurer un acces direct a chaque ligne de la matrice (creuse) des contraintes, on peut avoir recours a
+  > Un vecteur dont les cases representent chaque ligne...
+  >...qui sont elles-m^emes representees par un vecteur de tuples (colonne,valeur)
+
+Cela nous donne un vecteur de vecteurs de tuples (entier,entier)
+
+Dierence dans les contraintes
+sum(A[i,j]x[j] for j in ndn(A[i,:])) >= b[i])
+devient
+sum(v*x[j] for (j,v) in A[i]) >= b[i])
+
+@constraint(m, Salle[i=1:nbSalles], sum(A[i,j]x[j] for j in findn(A[i,:])) >= b[i])
+Devient - Double indiçage (j,v) dans la fonction sum !!
+@constraint(m, Salle[i=1:nbSalles], sum(v*x[j] for (j,v) in A[i]) >= b[i])
+
+Moralité : A[ligne] = [(colonne,valeur)]
+
+Il y a un 1 a la position (1,1)
+A = VectorfVectorfTuplefInt,Intggg(10)
+A[1] = [(1,1)
+
+Il y a un 1 a la position (1,1)
+Il y a un 1 a la position (1,4)
+A = VectorfVectorfTuplefInt,Intggg(10)
+A[1] = [(1,1),(4,1)
+
+Il y a un 1 a la position (1,1)
+Il y a un 1 a la position (1,4)
+Il y a un 1 a la position (1,5)
+A = VectorfVectorfTuplefInt,Intggg(10)
+A[1] = [(1,1),(4,1),(5,1)]
+
+Il y a un 1 a la position (1,1)
+Il y a un 1 a la position (1,4)
+Il y a un 1 a la position (1,5)
+Il y a un 1 a la position (2,1)...
+A = VectorfVectorfTuplefInt,Intggg(10)
+A[1] = [(1,1),(4,1),(5,1)]
+A 2] = [(1,1),
+
+
+
+
+
+
+
+A = Vector{Vector{Tuple{Int,Int}}}(10)
+A[1] = [(1,1),(4,1),(5,1)]
+A[2] = [(1,1),(2,1),(3,1)]
+A[3] = [(3,1),(7,1),(8,1)]
+A[4] = [(4,1),(6,1),(11,1),(12,1)]
+A[5] = [(2,1),(5,1),(6,1),(7,1),(9,1),(10,1)]
+A[6] = [(8,1),(9,1),(15,1)]
+A[7] = [(12,1),(13,1)]
+A[8] = [(10,1),(11,1),(13,1),(14,1),(17,1)]
+A[9] = [(14,1),(15,1),(16,1)]
+A[10] =[(16,1),(17,1)]
+
+nbCam = 17
+
+
+
+julia> nbCam = 17
+17
+
+julia> A
+10-element Array{Array{Tuple{Int64,Int64},1},1}:
+ Tuple{Int64,Int64}[(1, 1), (4, 1), (5, 1)]
+ Tuple{Int64,Int64}[(1, 1), (2, 1), (3, 1)]
+ Tuple{Int64,Int64}[(3, 1), (7, 1), (8, 1)]
+ Tuple{Int64,Int64}[(4, 1), (6, 1), (11, 1), (12, 1)]
+ Tuple{Int64,Int64}[(2, 1), (5, 1), (6, 1), (7, 1), (9, 1), (10, 1)]
+ Tuple{Int64,Int64}[(8, 1), (9, 1), (15, 1)]
+ Tuple{Int64,Int64}[(12, 1), (13, 1)]
+ Tuple{Int64,Int64}[(10, 1), (11, 1), (13, 1), (14, 1), (17, 1)]
+ Tuple{Int64,Int64}[(14, 1), (15, 1), (16, 1)]
+ Tuple{Int64,Int64}[(16, 1), (17, 1)]
+
+
+Un peu plus de fun ?
+Il est immediat de remplacer les tuples (entier,entier) par des tuples (caractere,entier) dans la solution precedente
+Cela permet d'indicer les colonnes par des lettres (comme les variables)
+
+indCam = ['B':'R'...] # Définition du tableau ['B','C','D',...,'Q','R']
+
+A = Vector{Vector{Tuple{Char,Int}}}(10)
+A[1] = [('B',1),('E',1),('F',1)]
+A[2] = [('B',1),('C',1),('D',1)]
+A[3] = [('D',1),('H',1),('I',1)]
+A[4] = [('E',1),('G',1),('L',1),('M',1)]
+A[5] = [('C',1),('F',1),('G',1),('H',1),('J',1),('K',1)]
+A[6] = [('I',1),('J',1),('P',1)]
+A[7] = [('M',1),('N',1)]
+A[8] = [('K',1),('L',1),('N',1),('O',1),('R',1)]
+A[9] = [('O',1),('P',1),('Q',1)]
+A[10] = [('Q',1),('R',1)]
+
+
+julia> indCam = ['B':'R'...] # Définition du tableau ['B','C','D',...,'Q','R']
+17-element Array{Char,1}:
+ 'B'
+ 'C'
+ 'D'
+ 'E'
+ 'F'
+ 'G'
+ 'H'
+ 'I'
+ 'J'
+ 'K'
+ 'L'
+ 'M'
+ 'N'
+ 'O'
+ 'P'
+ 'Q'
+ 'R'
+
+julia> A
+10-element Array{Array{Tuple{Char,Int64},1},1}:
+ Tuple{Char,Int64}[('B', 1), ('E', 1), ('F', 1)]
+ Tuple{Char,Int64}[('B', 1), ('C', 1), ('D', 1)]
+ Tuple{Char,Int64}[('D', 1), ('H', 1), ('I', 1)]
+ Tuple{Char,Int64}[('E', 1), ('G', 1), ('L', 1), ('M', 1)]
+ Tuple{Char,Int64}[('C', 1), ('F', 1), ('G', 1), ('H', 1), ('J', 1), ('K', 1)]
+ Tuple{Char,Int64}[('I', 1), ('J', 1), ('P', 1)]
+ Tuple{Char,Int64}[('M', 1), ('N', 1)]
+ Tuple{Char,Int64}[('K', 1), ('L', 1), ('N', 1), ('O', 1), ('R', 1)]
+ Tuple{Char,Int64}[('O', 1), ('P', 1), ('Q', 1)]
+ Tuple{Char,Int64}[('Q', 1), ('R', 1)]
+
+
+Nous pouvons maintenant utiliser directement des caractères pour les indices des caméras
+Cas courant en optimisation combinatoire : les valeurs signicatives de la matrice creuse ne sont que des 1
+On peut alors stocker uniquement les colonnes signicatives (et pas des tuples (colonne, valeur))
+
+JuMP permet d'utiliser n'importe quel intervalle ou tableau d'indices (de n'importe quel type) pour les variables de décisions (cela ne s'applique pas aux tableaux en général en Julia, ni aux matrices creuses)
+Comme nous savons que nous n'avons que des 1 dans les valeurs significative de notre "matrice creuse", nous pouvons simplifier en utilisant simplement un vecteur de vecteurs de Char
+
+indCam = ['B':'R'...] # Définition du tableau ['B','C','D',...,'Q','R']
+
+A = Vector{Vector{Char}}(10)
+A[1] = ['B','E','F']
+A[2] = ['B','C','D']
+A[3] = ['D','H','I']
+A[4] = ['E','G','L','M']
+A[5] = ['C','F','G','H','J','K']
+A[6] = ['I','J','P']
+A[7] = ['M','N']
+A[8] = ['K','L','N','O','R']
+A[9] = ['O','P','Q']
+A[10] = ['Q','R']
+
+# Déclaration de la fonction objectif (avec le sens d'optimisation)
+@objective(m, Min, sum(x[j] for j in indCam))
+# Déclaration des contraintes
+@constraint(m, Salle[i=1:nbSalles], sum(x[j] for j in A[i]) >= b[i])
+
+Et pour aller encore plus loin :
+Et si les contraintes n'etaient pas indicees par des entiers contigus, voire pas par des entiers ? (pas le cas dans l'exemple) On pourrait penser à Utilisation d'un tableau associatif qui associe une cle (l'indice
+de la contrainte) a un vecteur de colonnes signicatives qui s'écrit :
+Dict{Int,Vector{Char}}
+
+IndCam = ['B':'R'...] # Définition du tableau ['B','C','D',...,'Q','R']
+SCam = Dict(1 => ['B','E','F'],
+            2 => ['B','C','D'],
+            3 => ['D','H','I'],
+            4 => ['E','G','L','M'],
+            5 => ['C','F','G','H','J','K'],
+            6 => ['I','J','P'],
+            7 => ['M','N'],
+            8 => ['K','L','N','O','R'],
+            9 => ['O','P','Q'],
+            10 => ['Q','R'])
+
+julia> SCam = Dict(1 => ['B','E','F'],
+                   2 => ['B','C','D'],
+                   3 => ['D','H','I'],
+                   4 => ['E','G','L','M'],
+                   5 => ['C','F','G','H','J','K'],
+                   6 => ['I','J','P'],
+                   7 => ['M','N'],
+                   8 => ['K','L','N','O','R'],
+                   9 => ['O','P','Q'],
+                   10 => ['Q','R'])
+Dict{Int64,Array{Char,1}} with 10 entries:
+              7  => ['M', 'N']
+              4  => ['E', 'G', 'L', 'M']
+              9  => ['O', 'P', 'Q']
+              10 => ['Q', 'R']
+              2  => ['B', 'C', 'D']
+              3  => ['D', 'H', 'I']
+              5  => ['C', 'F', 'G', 'H', 'J', 'K']
+              8  => ['K', 'L', 'N', 'O', 'R']
+              6  => ['I', 'J', 'P']
+              1  => ['B', 'E', 'F']
+
+
+
+Création du membre droit de la contrainte :
+
+Il se trouve que dans ce cas ci, c'est un membre droit simple qui répond à la contrainte suivante :
+# Tableau de 10 cases initialisées à 1 sauf si i == 4, on a alors 2
+b = [if i != 4 1 else 2 end for i in 1:10]
+Connaissant A, on pourrait très bien penser a faire un truc de ce style avec size(A,1), le nombre de ligne de la matrice A (nb de contraintes)
+b = [if i != 4 1 else 2 end for i in 1:size(A,1)]
