@@ -3,9 +3,8 @@
 
 using JuMP, GLPKMathProgInterface
 
-function modelImplicite(solverSelecte
 
-function modelImplicite(solverSelected, coef::Vector{Int}, A::Vector{Vector{Tuple{Char,Int}}},indPosVille::Int,p::Int)
+function modelImplicite(solverSelected, coef::Dict{Char,Int}, A::Dict{Char,Vector{Tuple{Char,Int}}},indPosVille::Vector{Char},p::Int)
     m = Model(solver = solverSelected)
     nbvar = length(coef)
     nbctr = length(A)
@@ -92,7 +91,7 @@ A = Dict( 'A' => [('A',1),('B',1),('C',1),('D',1)],
 
 m = modelImplicite(GLPKSolverMIP(),coef,A,indPosVille,p)
 status = solve(m)
-
+imp(m)
 
 
 ###############################################################################
