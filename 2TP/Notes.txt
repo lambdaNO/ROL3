@@ -1,0 +1,19 @@
+SCP : Set Cover Problem
+Problème de couverture d'ensemble à cout unique
+Dans le cours, nous avons vu qu'il était possible d'utiliser une heuristique pour plus facilement résoudre le problème.
+Recherche de la variable la plus présente dans les contraintes. on cherche à la supprimer ...
+
+
+le problème de couverture par ensembles (Set Cover problem en anglais1) est un problème d'algorithmique particulièrement important.
+
+Étant donné un ensemble A, on dit qu'un élément e est couvert par A si e appartient à A. Étant donné un ensemble U et une famille S de sous-ensembles de U, le problème consiste à couvrir tous les éléments U avec une sous-famille de S la plus petite possible.
+
+Une version plus générale consiste à assigner des poids aux éléments de S, et à chercher la sous-famille de poids minimal.
+
+lancement dans Julia :
+julia> include("scp.jl")
+julia> mainSCP("scpe5.txt")
+
+
+scpe5 = Rapide
+scpclr13 = Plutot long
