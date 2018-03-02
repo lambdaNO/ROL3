@@ -30,11 +30,11 @@ end
 function imp(m)
     println("> Implantation des usines de Naoned Cola")
     if status == :Optimal
-        println("Problème résolu à l'optimalité - Vacances ? :) ")
+        println("Problème résolu à l'optimalité")
         println("Nombre optimal de personnes touchées ",getobjectivevalue(m)*1000) # affichage de la valeur optimale
-        println("Liste des villes où l'on doit implanter une usine pour pouvoir conquérir le monde avec notre succulente boisson")
+        #println("Liste des villes où l'on doit implanter une usine pour pouvoir conquérir le monde avec notre succulente boisson")
         for i in indPosVille
-            if isapprox(getvalue(m[:y][i]) print(i," ")
+            if isapprox(getvalue(m[:y][i]),1) print(i," ")
             end
         end
         println()
@@ -61,7 +61,7 @@ coef = Dict(
     'J' => 22,
     'K' => 41,
     'L' => 53,
-    'M'=> 66
+    'M' => 66
     )
 # On vérifie la taille en faisant length(coef)
 
@@ -74,7 +74,7 @@ indPosVille = ['A':'M'...]
 A = Dict( 'A' => ['A','B','C','D'],
           'B' => ['A','B','C','D','E','F','G'],
           'C' => ['A','B','C','D'],
-          'D' => ['A','B','C','D','E','F','G','J','K',],
+          'D' => ['A','B','C','D','E','F','G','J','K'],
           'E' => ['B','D','E','F','G','I','J','K'],
           'F' => ['B','D','E','F','G','I','J','K'],
           'G' => ['B','D','E','F','G','H','I','J','K'],
