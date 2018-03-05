@@ -10,7 +10,7 @@ https://jump.readthedocs.io/en/latest/
 #### Opérandes de base :
 https://docs.julialang.org/en/release-0.4/stdlib/punctuation/
 
-Moralité :
+#### Moralité :
 	Single line comment : #
 	Multi lines comment : #= ... =#
 
@@ -18,3 +18,7 @@ Moralité :
 Site officiel du langage JULIA : https://julialang.org/
 Site officiel de JuliOPT (comprenant JuMP) : http://www.juliaopt.org/
 Manuel complet de JuMP 0.18 en ligne : http://www.juliaopt.org/JuMP.jl/0.18/
+
+
+#### Opérations mathématiques
+https://docs.julialang.org/en/release-0.4/manual/mathematical-operations/

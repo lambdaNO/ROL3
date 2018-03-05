@@ -5,6 +5,8 @@ using JuMP, GLPKMathProgInterface
 
 
 function modelImplicite(solverSelected, coef::Dict{Char,Int}, A::Dict{Char,Vector{Char}},indPosVille::Vector{Char},p::Int)
+    #m = Model(solver = GLPKSolverMIP())
+
     m = Model(solver = solverSelected)
     nbvar = length(coef)
     nbctr = length(A)

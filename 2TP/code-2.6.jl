@@ -1,12 +1,10 @@
 ## Modèle implicite - Exercice 2.6
-
 using JuMP, GLPKMathProgInterface
-
-function modelImplicite(solverSelected, r::Vector{Int},q::Vector{Int},d::Vector{Int} A::Array{Int64,2})
+function modelImplicite(solverSelected, r::Vector{Int}, q::Vector{Int}, d::Vector{Int}, A::Array{Int64,2})
+    #m = Model(solver = GLPKSolverMIP())
     m = Model(solver = solverSelected)
     nbSite = size(A,1)
     nbClient = size(A,2)
-
     #=
         x_{i,j} la quantité de service livrée au client i par le service j
         x_{i,j} \in [0,1]
@@ -17,32 +15,33 @@ function modelImplicite(solverSelected, r::Vector{Int},q::Vector{Int},d::Vector{
               0 sinon
     =#
     @variable(m,y[1:nbSite],Bin)
-
-    @objective(m,Min,(sum(y[j]r[j] for j in 1:nbSite)+ sum(sum(A[i,j]x[i,j]for i in 1:nbClient) for j in 1:nbSite)))
-
+    @objective(m,Min,(sum(y[j]r[j] for j in 1:nbSite)+ sum(sum(A[i,j]x[i,j]for i in 1:nbClient)for j in 1:nbSite)))
     # Un client reçois son service depuis n'importe quel entrepot
     @constraint(m,Satisfaction[i=1:nbClient],(sum(x[i,j] for j in 1:nbSite)==1))
-    @constraint(m,Satisfaction[j=1:nbSite],(sum(d[i]x[i,j] for i in 1:nbClient)<=q[j]y[j]))
-
-return m
+    # On livre un client via un dépôt suivant la demande exprimé - membre droit : Activation d'une contrainte de capacité (ou non)
+    @constraint(m,Livraison[j=1:nbSite],(sum(d[i]x[i,j] for i in 1:nbClient)<=q[j]y[j]))
+    return m
 end
 
 function imp(m)
-    println("> Implantation des usines de Naoned Cola")
+    println("> Implantation des entrepôts pour désservir des centrales d'achats")
     if status == :Optimal
         println("Problème résolu à l'optimalité")
-        println("Nombre optimal de personnes touchées ",getobjectivevalue(m)*1000) # affichage de la valeur optimale
+        println("Coût minimal des implantations : ", round(getobjectivevalue(m),3), " k€")
+
+        println("Sites retenus pour l'implantation d'entrepôts : ")
+            for j in 1:nbSite
+                if isapprox(getvalue(m[:y][j]),1) print(j," ")
+                end
+            end
+
     elseif status == :Unbounded
         println("Problème non-borné")
     elseif status == :Infeasible
         println("Problème impossible")
     end
 end
-
-
-
-
-
+################################################################################
 ###############################################################################
 ## Déclaration des données :
 #### Les entrepôts
@@ -77,6 +76,8 @@ A = [
     190 150 130 inf inf inf 200 180 150 inf inf inf;
     200 180 150 inf inf inf 100 80 50 50 60 100
 ]
-
+################################################################################
+################################################################################
 m = modelImplicite(GLPKSolverMIP(),r,q,d,A)
 status = solve(m)
+imp(m)
