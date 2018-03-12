@@ -24,11 +24,11 @@ function modelImplicite(solverSelected, r::Vector{Int}, q::Vector{Int}, d::Vecto
 end
 
 function imp(m)
+    nbSite = size(A,1)
     println("> Implantation des entrepôts pour désservir des centrales d'achats")
     if status == :Optimal
         println("Problème résolu à l'optimalité")
         println("Coût minimal des implantations : ", round(getobjectivevalue(m),3), " k€")
-
         println("Sites retenus pour l'implantation d'entrepôts : ")
             for j in 1:nbSite
                 if isapprox(getvalue(m[:y][j]),1) print(j," ")
@@ -76,6 +76,8 @@ A = [
     190 150 130 inf inf inf 200 180 150 inf inf inf;
     200 180 150 inf inf inf 100 80 50 50 60 100
 ]
+
+
 ################################################################################
 ################################################################################
 m = modelImplicite(GLPKSolverMIP(),r,q,d,A)
