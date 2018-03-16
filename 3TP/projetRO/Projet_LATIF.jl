@@ -124,11 +124,18 @@ function modeleIplicite(solverSelected,C::Array{Int64,2})
 end
 
 
-
-m = modeleIplicite(GLPKSolverMIP(),parseTSP("plat/exemple.dat"))
+# Matrice des contraintes :
+C = parseTSP("plat/exemple.dat")
+m = modeleIplicite(GLPKSolverMIP(),C)
 #=
     Instruction à réalisé - Avant automatisation
     status = solve(m)
     getobjectivevalue(m)
     getvalue(m[:x])
+
+#julia> getvalue(m[:x][1,7])
+#0.0
+#julia> getvalue(m[:x][7,1])
+#1.0
+# => Moralité (ligne x colonne)
 =#
