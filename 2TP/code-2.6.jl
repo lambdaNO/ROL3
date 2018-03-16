@@ -1,14 +1,5 @@
 ## Modèle implicite - Exercice 2.6
-<<<<<<< HEAD
 
-using JuMP, GLPKMathProgInterface
-
-function modelImplicite(solverSelected, r::Vector{Int},q::Vector{Int},d::Vector{Int} A::Array{Int64,2})
-    m = Model(solver = solverSelected)
-    nbSite = size(A,1)
-    nbClient = size(A,2)
-
-=======
 using JuMP, GLPKMathProgInterface
 function modelImplicite(solverSelected, r::Vector{Int}, q::Vector{Int}, d::Vector{Int}, A::Array{Int64,2})
     #m = Model(solver = GLPKSolverMIP())
