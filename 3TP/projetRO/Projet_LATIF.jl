@@ -123,6 +123,20 @@ function modeleIplicite(solverSelected,C::Array{Int64,2})
     return m
 end
 
+function permutation(m::Model)
+    V=[0 for i in 1:size(C,1)]
+        for i in 1:size(C,1)
+            for j in 1:size(C,1)
+                if isapprox(getvalue(m[:x][j,i]),1)
+                    print("(",i," -> ",j,")")
+                    V[i]=j
+                end
+            end
+        end
+        println()
+    return V
+end
+
 
 # Matrice des contraintes :
 C = parseTSP("plat/exemple.dat")
@@ -138,4 +152,25 @@ m = modeleIplicite(GLPKSolverMIP(),C)
 #julia> getvalue(m[:x][7,1])
 #1.0
 # => Moralité (ligne x colonne)
+
+Récupération des permutation
+P = permutation(m)
+=#
+
+
+
+#=
+status = solve(m)
+getobjectivevalue(m)
+getvalue(m[:x])
+P = permutation(m)
+=#
+
+
+
+
+
+
+#=
+    Idée, utiliser la commande push! ajouter progressivement dans le modele les contraintes de cassage de cycle que l'on va trouvé
 =#
