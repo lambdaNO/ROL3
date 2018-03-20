@@ -17,8 +17,57 @@ using JuMP, GLPKMathProgInterface
 
 # Fonction de résolution exacte du problème de voyageur de commerce, dont le distancier est passé en paramètre
 
-function TSP(C::Array{Int,2})
-# À compléter!
+function TSP(C::Array{Int64,2})
+    #m = Model(solver =solverSelected)
+    #C=parseTSP("plat/exemple.dat")
+    m = Model(solver = GLPKSolverMIP())
+    nbPoint = size(C,1)
+    #=
+    Notations :
+        i : Villes de départ
+        j : Villes d'arrivée
+    Variable :
+        x_{i,j} = 1 si on va de la ville i à la ville j
+                  0 sinon
+    =#
+    @variable(m,x[1:nbPoint,1:nbPoint],Bin)
+    #=
+        Déterminer l'ordre de visite des points d'intérêts d'un drône de manière à minimiser le temps total d'exploration (consommation d'énergie)
+    =#
+    @objective(m,Min,(sum(sum(C[i,j]x[i,j] for j in 1:nbPoint)for i in 1:nbPoint)))
+    #=
+        Contrainte 1
+        On part de la ville i une seule et unique fois
+    =#
+    ## @constraint(m,ctrDepart[i=1:nbPoint],sum(x[i,j] for j in 1:nbPoint,if j != i) ==1) ## A tester écriture du prof ,if j != i
+    @constraint(m,ctrDepart[i=1:nbPoint],sum(x[i,j] for j in 1:nbPoint) ==1)
+
+    #=
+        Contrainte 2
+        On arrive à la ville j une seule et unique fois
+    =#
+    @constraint(m,ctrArrivee[j=1:nbPoint],sum(x[i,j] for i in 1:nbPoint)==1)
+    #=
+        Contrainte 3 - ajout des i!=j
+    =#
+    @constraint(m,ctr2i[i=1:nbPoint],x[i,i]==0)
+    #=
+        Contrainte 4 - Probablement redondante avec la contrainte 3
+    =#
+    @constraint(m,ctr2j[j=1:nbPoint],x[j,j]==0)
+    return m
+end
+
+function imp(m::Model)
+    println("> Ordre de visite des drônes")
+    if status == :Optimal
+        println("temps total = ",getobjectivevalue(m))
+        getvalue(m[:x])
+    elseif status == :Unbounded
+        println("Problème non-borné")
+    elseif status == :Infeasible
+        println("Problème impossible")
+    end
 end
 
 
@@ -78,57 +127,17 @@ function parseTSP(nomFichier::String)
 end
 
 
-#=
-Tentative de création du modèle implicite première session.
-=#
 
-function modeleIplicite(solverSelected,C::Array{Int64,2})
-    #m = Model(solver =solverSelected)
-    #C=parseTSP("plat/exemple.dat")
-    m = Model(solver = GLPKSolverMIP())
-    nbPoint = size(C,1)
-    #=
-    Notations :
-        i : Villes de départ
-        j : Villes d'arrivée
-    Variable :
-        x_{i,j} = 1 si on va de la ville i à la ville j
-                  0 sinon
-    =#
-    @variable(m,x[1:nbPoint,1:nbPoint],Bin)
-    #=
-        Déterminer l'ordre de visite des points d'intérêts d'un drône de manière à minimiser le temps total d'exploration (consommation d'énergie)
-    =#
-    @objective(m,Min,(sum(sum(C[i,j]x[i,j] for j in 1:nbPoint)for i in 1:nbPoint)))
-    #=
-        Contrainte 1
-        On part de la ville i une seule et unique fois
-    =#
-    ## @constraint(m,ctrDepart[i=1:nbPoint],sum(x[i,j] for j in 1:nbPoint,if j != i) ==1) ## A tester écriture du prof ,if j != i
-    @constraint(m,ctrDepart[i=1:nbPoint],sum(x[i,j] for j in 1:nbPoint) ==1)
 
-    #=
-        Contrainte 2
-        On arrive à la ville j une seule et unique fois
-    =#
-    @constraint(m,ctrArrivee[j=1:nbPoint],sum(x[i,j] for i in 1:nbPoint)==1)
-    #=
-        Contrainte 3 - ajout des i!=j
-    =#
-    @constraint(m,ctr2i[i=1:nbPoint],x[i,i]==0)
-    #=
-        Contrainte 4 - Probablement redondante avec la contrainte 3
-    =#
-    @constraint(m,ctr2j[j=1:nbPoint],x[j,j]==0)
-    return m
-end
 
-function permutation(m::Model)
-    V=[0 for i in 1:size(C,1)]
-        for i in 1:size(C,1)
-            for j in 1:size(C,1)
-                if isapprox(getvalue(m[:x][j,i]),1)
-                    print("(",i," -> ",j,")")
+function permutation(X::Array{Float64,2})
+    nbPoint = size(X,1)
+    V=[0 for i in 1:nbPoint]
+        println("Permutations trouvées : ")
+        for i in 1:nbPoint
+            for j in 1:nbPoint
+                if (X[i,j]==1)
+                    println("(",i,")" ," - (",i," -> ",j,") ")
                     V[i]=j
                 end
             end
@@ -138,33 +147,57 @@ function permutation(m::Model)
 end
 
 
+
+function detectcycle(P::Array{Int64,1})
+    nbPoint = size(P,1)
+    ss_cycle = Vector{Int64}
+    cycle = Vector{Vector{Int64}}
+    ss_cycle = [0]
+    cycle = [[0]]
+    ##Point = sort(P)
+
+    for i in 1:nbPoint
+        cpt = 0
+        init = i
+        ss_cycle = [init]
+        println("Sommet de départ = ", init)
+        x = P[init]
+        println("   Tentative d'ajout de ", x," à sous cycle passe ", i)
+        push!(ss_cycle,x)
+        while (x != init && cpt <= nbPoint)
+            cpt = cpt + 1;;
+            println("   > x = ", x)
+            tmp = x
+            x = P[x]
+            println("   Tentative d'ajout de ", x," à sous cycle passe ", i)
+            push!(ss_cycle,x)
+            #println("   > P[x] = y = ", y)
+        end
+        println("   ss_cycle à la fin de la passe ", i)
+        println(ss_cycle)
+        push!(cycle,ss_cycle)
+        empty!(ss_cycle)
+        println()
+    end
+    println("cycle à la fin de la fonction")
+    println(cycle)
+    return cycle
+end
+
+
 # Matrice des contraintes :
+#=
 C = parseTSP("plat/exemple.dat")
-m = modeleIplicite(GLPKSolverMIP(),C)
-#=
-    Instruction à réalisé - Avant automatisation
-    status = solve(m)
-    getobjectivevalue(m)
-    getvalue(m[:x])
-
-#julia> getvalue(m[:x][1,7])
-#0.0
-#julia> getvalue(m[:x][7,1])
-#1.0
-# => Moralité (ligne x colonne)
-
-Récupération des permutation
-P = permutation(m)
-=#
-
-
-
-#=
+m = TSP(C)
 status = solve(m)
-getobjectivevalue(m)
-getvalue(m[:x])
-P = permutation(m)
+imp(m)
+x = getvalue(m[:x])
+P=permutation(x)
 =#
+
+
+
+
 
 
 
