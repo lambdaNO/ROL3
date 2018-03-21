@@ -185,6 +185,60 @@ function detectcycle(P::Array{Int64,1})
 end
 
 
+
+
+
+#https://zestedesavoir.com/tutoriels/681/a-la-decouverte-des-algorithmes-de-graphe/727_bases-de-la-theorie-des-graphes/3353_parcourir-un-graphe/
+# Bien penser à faire une fonction qui initialise les 3 vecteurs suivants et qui fait appel à explorer.
+
+
+nbPoint = size(P,1)
+etat = zeros(Int64,nbPoint)
+pere = zeros(Int64,nbPoint)
+
+
+function DFS(G::Array{Int64,1},n::Int64)
+    println("       DFS Sommet départ : ", n)
+    println("       @ DFS Ajouter sommet courant ici (",n,") au sous cycle " )
+    etat[n] = 1
+    println("       DFS Etat sommets : ", etat)
+    v = G[n]
+    println("       DFS Sommet successeur de  ",n," :  ", v)
+    println("       DFS Etat père avant appel rec : ",pere)
+
+    if (etat[v]==0)
+        pere[v] = n
+        DFS(P,v)
+    end
+    println("       DFS Etat après appel rec : ",etat)
+    println("       DFS Père après appel rec : ",pere)
+    println()
+    return 1
+end
+
+function explorer(G::Array{Int64,1})
+    println("EXP : Pere avant exploration : ", pere)
+    println("EXP : Etat avant exploration : ", etat)
+    for i in 1:nbPoint
+        println("   EXP : Etat de ", i, "avant exploration : ", etat[i])
+        if (etat[i] ==0)
+            pere[i] = 0
+            DFS(G,i)
+            println("Ajouter le sous cycle au cycle ici")
+        end
+        println("   EXP : Etat de ", i, " :  après exploration", etat[i])
+    end
+    println("EXP : Pere après exploration : ", pere)
+    println("EXP : Etat après exploration : ", etat)
+end
+
+
+
+
+
+
+
+
 # Matrice des contraintes :
 #=
 C = parseTSP("plat/exemple.dat")
