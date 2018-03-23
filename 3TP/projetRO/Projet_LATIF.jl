@@ -216,6 +216,35 @@ function explorer(G::Array{Int64,1},etat::Array{Int64,1},pere::Array{Int64,1})
     return cycle
 end
 
+function ind_min(C::Array{Array{Int64,1},1})
+    taille = zeros(length(C))
+    for i = 1:length(C)
+        taille[i] = length(C[i])
+    end
+    #println(taille)
+    return indmin(taille)
+end
+
+
+
+## PATH MAC
+## cd Desktop/ÉTUDES/FAC/S6/RO/TP/3TP/projetRO
+
+## m est notre modèle
+
+# Matrice des contraintes :
+#=
+C = parseTSP("plat/exemple.dat")
+m = TSP(C)
+status = solve(m)
+imp(m)
+
+## Attention : xval ne sont pas les variables de décisions mais les valeurs de variables - xval est un alias bien pratique
+
+xval = getvalue(m[:x])
+P=permutation(xval)
+=#
+
 #=
     nbPoint = size(P,1)
     etat = zeros(Int64,nbPoint)
@@ -224,26 +253,62 @@ end
     cycle = explorer(P,etat,pere)
 
 =#
-
-
-## tenter de trier les cycles en fonction de la première coordonnée du cycle
-
-
-
-## PATH MAC
-## cd Desktop/ÉTUDES/FAC/S6/RO/TP/3TP/projetRO
-
-
-
-# Matrice des contraintes :
 #=
-C = parseTSP("plat/exemple.dat")
-m = TSP(C)
+ind = ind_min(cycle)
+## cycle à détruire.
+destr = cycle[ind]
+i = destr[1]
+j = destr[2]
+
+
+x=m[:x]
+expr = AffExpr()
+push!(expr,1.0,x[i,j])
+push!(expr,1.0,x[j,i])
+## @constraint(m::Model, con) - add linear or quadratic constraints.
+con = @constraint(m,expr <= 1)
+
+
+## julia> m
+## Minimization problem with:
+## * 28 linear constraints
+## * 49 variables: 49 binary
+## julia> con = @constraint(m,expr <= 1)
+## x[2,6] + x[6,2] ≤ 1
+## julia> m
+## Minimization problem with:
+## * 29 linear constraints
+## * 49 variables: 49 binary
+## Solver is GLPKInterfaceMIP
+
 status = solve(m)
 imp(m)
-x = getvalue(m[:x])
-P=permutation(x)
+xval = getvalue(m[:x])
+P=permutation(xval)
+
+
+nbPoint = size(P,1)
+etat = zeros(Int64,nbPoint)
+pere = zeros(Int64,nbPoint)
+
+cycle = explorer(P,etat,pere)
+length(cycle)
+
+
+CONTINUER A TROUVER LES CYCLES ET SOLVER LE PROBLEME TANT QUE LE NOMBRE DE CYCLE EST DIFFERENT DE 1
+## NECESSITE UNE AUTOMATISATION A BASE DE TANT QUE
+
+
+
+
 =#
+
+
+
+
+## Attention, le distancier est symétrique, il est donc possible de trouver deux cycles différents.
+
+
 
 
 #=
