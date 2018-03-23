@@ -148,41 +148,7 @@ end
 
 
 
-function detectcycle(P::Array{Int64,1})
-    nbPoint = size(P,1)
-    ss_cycle = Vector{Int64}
-    cycle = Vector{Vector{Int64}}
-    ss_cycle = [0]
-    cycle = [[0]]
-    ##Point = sort(P)
 
-    for i in 1:nbPoint
-        cpt = 0
-        init = i
-        ss_cycle = [init]
-        println("Sommet de départ = ", init)
-        x = P[init]
-        println("   Tentative d'ajout de ", x," à sous cycle passe ", i)
-        push!(ss_cycle,x)
-        while (x != init && cpt <= nbPoint)
-            cpt = cpt + 1;;
-            println("   > x = ", x)
-            tmp = x
-            x = P[x]
-            println("   Tentative d'ajout de ", x," à sous cycle passe ", i)
-            push!(ss_cycle,x)
-            #println("   > P[x] = y = ", y)
-        end
-        println("   ss_cycle à la fin de la passe ", i)
-        println(ss_cycle)
-        push!(cycle,ss_cycle)
-        empty!(ss_cycle)
-        println()
-    end
-    println("cycle à la fin de la fonction")
-    println(cycle)
-    return cycle
-end
 
 
 
@@ -192,12 +158,18 @@ end
 # Bien penser à faire une fonction qui initialise les 3 vecteurs suivants et qui fait appel à explorer.
 
 
-nbPoint = size(P,1)
-etat = zeros(Int64,nbPoint)
-pere = zeros(Int64,nbPoint)
 
 
-function DFS(G::Array{Int64,1},n::Int64)
+## De manière générale, push! nécéssite que le vecteur dans lequel on veut pusher soit non vide.
+## J'ajoute donc [0] que je veux shift à la fin (méthode sur les collections qui vire le premier élément)
+
+
+
+## DFS(P,1,[0])
+
+function DFS(G::Array{Int64,1},n::Int64,ss_cycle::Array{Int64,1},etat::Array{Int64,1},pere::Array{Int64,1})
+    ss_cycle = push!(ss_cycle,n)
+    println("ss_cycle : ", ss_cycle)
     println("       DFS Sommet départ : ", n)
     println("       @ DFS Ajouter sommet courant ici (",n,") au sous cycle " )
     etat[n] = 1
@@ -205,37 +177,67 @@ function DFS(G::Array{Int64,1},n::Int64)
     v = G[n]
     println("       DFS Sommet successeur de  ",n," :  ", v)
     println("       DFS Etat père avant appel rec : ",pere)
-
+    println(v," etat ",etat[v]==0)
     if (etat[v]==0)
+        println("Si v ", v)
+        println("Si n ", n)
         pere[v] = n
-        DFS(P,v)
+        DFS(P,v,ss_cycle)
     end
     println("       DFS Etat après appel rec : ",etat)
     println("       DFS Père après appel rec : ",pere)
     println()
-    return 1
+
+    println("Fin n > ",n)
+    println("Fin v > ",v)
+
+    println("--------Fin DFS-------")
+    return ss_cycle
 end
 
-function explorer(G::Array{Int64,1})
+function explorer(G::Array{Int64,1},etat::Array{Int64,1},pere::Array{Int64,1})
+    ## On passe le vecteur [[0]] en paramètre pour que l'on puisse pusher à l'intérieur
+    cycle = [[0]]
     println("EXP : Pere avant exploration : ", pere)
     println("EXP : Etat avant exploration : ", etat)
     for i in 1:nbPoint
-        println("   EXP : Etat de ", i, "avant exploration : ", etat[i])
+        println("   EXP : Etat de ", i, " : avant exploration : ", etat[i])
         if (etat[i] ==0)
             pere[i] = 0
-            DFS(G,i)
+            ## On passe le vecteur [0] en paramètre pour que l'on puisse pusher à l'intérieur
+            ss_cycle = DFS(G,i,[0],etat,pere)
+            println("=> EXP - ss_cycle retourné avant shift! ", ss_cycle)
+            ## On vire le [0] ajouté artificiellement précédemment.
+            shift!(ss_cycle)
+            println("=> EXP - ss_cycle retourné après shitf! ", ss_cycle)
             println("Ajouter le sous cycle au cycle ici")
+            push!(cycle,ss_cycle)
+            println("=> EXP - état cycle ",cycle)
         end
         println("   EXP : Etat de ", i, " :  après exploration", etat[i])
     end
     println("EXP : Pere après exploration : ", pere)
     println("EXP : Etat après exploration : ", etat)
+    ## On vire le [0] ajouté artificiellement précédemment.
+    shift!(cycle)
+    return cycle
 end
 
+    nbPoint = size(P,1)
+    etat = zeros(Int64,nbPoint)
+    pere = zeros(Int64,nbPoint)
+
+    cycle = explorer(P,etat,pere)
+    return cycle
 
 
 
+## tenter de trier les cycles en fonction de la première coordonnée du cycle
 
+
+
+## PATH MAC
+## cd Desktop/ÉTUDES/FAC/S6/RO/TP/3TP/projetRO
 
 
 
@@ -250,11 +252,12 @@ P=permutation(x)
 =#
 
 
+#=
+## Déclaration permutations suivantes pour test
+T = [7;5;4;3;6;2;1]
 
 
-
-
-
+=#
 
 
 
