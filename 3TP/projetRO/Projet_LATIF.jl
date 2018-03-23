@@ -156,15 +156,8 @@ end
 
 #https://zestedesavoir.com/tutoriels/681/a-la-decouverte-des-algorithmes-de-graphe/727_bases-de-la-theorie-des-graphes/3353_parcourir-un-graphe/
 # Bien penser à faire une fonction qui initialise les 3 vecteurs suivants et qui fait appel à explorer.
-
-
-
-
 ## De manière générale, push! nécéssite que le vecteur dans lequel on veut pusher soit non vide.
 ## J'ajoute donc [0] que je veux shift à la fin (méthode sur les collections qui vire le premier élément)
-
-
-
 ## DFS(P,1,[0])
 
 function DFS(G::Array{Int64,1},n::Int64,ss_cycle::Array{Int64,1},etat::Array{Int64,1},pere::Array{Int64,1})
@@ -223,12 +216,13 @@ function explorer(G::Array{Int64,1},etat::Array{Int64,1},pere::Array{Int64,1})
     return cycle
 end
 
+
     nbPoint = size(P,1)
     etat = zeros(Int64,nbPoint)
     pere = zeros(Int64,nbPoint)
 
     cycle = explorer(P,etat,pere)
-    return cycle
+
 
 
 
