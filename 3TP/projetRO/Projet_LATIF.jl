@@ -175,7 +175,7 @@ function DFS(G::Array{Int64,1},n::Int64,ss_cycle::Array{Int64,1},etat::Array{Int
         println("Si v ", v)
         println("Si n ", n)
         pere[v] = n
-        DFS(P,v,ss_cycle)
+        DFS(P,v,ss_cycle,etat,pere)
     end
     println("       DFS Etat après appel rec : ",etat)
     println("       DFS Père après appel rec : ",pere)
@@ -216,14 +216,14 @@ function explorer(G::Array{Int64,1},etat::Array{Int64,1},pere::Array{Int64,1})
     return cycle
 end
 
-
+#=
     nbPoint = size(P,1)
     etat = zeros(Int64,nbPoint)
     pere = zeros(Int64,nbPoint)
 
     cycle = explorer(P,etat,pere)
 
-
+=#
 
 
 ## tenter de trier les cycles en fonction de la première coordonnée du cycle
