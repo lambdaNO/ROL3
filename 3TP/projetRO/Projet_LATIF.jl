@@ -41,7 +41,6 @@ function TSP(C::Array{Int64,2})
     =#
     ## @constraint(m,ctrDepart[i=1:nbPoint],sum(x[i,j] for j in 1:nbPoint,if j != i) ==1) ## A tester écriture du prof ,if j != i
     @constraint(m,ctrDepart[i=1:nbPoint],sum(x[i,j] for j in 1:nbPoint) ==1)
-
     #=
         Contrainte 2
         On arrive à la ville j une seule et unique fois
@@ -59,10 +58,9 @@ function TSP(C::Array{Int64,2})
 end
 
 function imp(m::Model)
-    println("> Ordre de visite des drônes")
     if status == :Optimal
         println("temps total = ",getobjectivevalue(m))
-        getvalue(m[:x])
+        #println("Ordre de visite des points :", permutation(getvalue(m[:x])))
     elseif status == :Unbounded
         println("Problème non-borné")
     elseif status == :Infeasible
@@ -127,17 +125,14 @@ function parseTSP(nomFichier::String)
 end
 
 
-
-
-
 function permutation(X::Array{Float64,2})
     nbPoint = size(X,1)
     V=[0 for i in 1:nbPoint]
-        println("Permutations trouvées : ")
+        println("   Permutations :")
         for i in 1:nbPoint
             for j in 1:nbPoint
                 if (X[i,j]==1)
-                    println("(",i,")" ," - (",i," -> ",j,") ")
+                    print("(",i," -> ",j,") ")
                     V[i]=j
                 end
             end
@@ -147,14 +142,6 @@ function permutation(X::Array{Float64,2})
 end
 
 
-
-
-
-
-
-
-
-#https://zestedesavoir.com/tutoriels/681/a-la-decouverte-des-algorithmes-de-graphe/727_bases-de-la-theorie-des-graphes/3353_parcourir-un-graphe/
 # Bien penser à faire une fonction qui initialise les 3 vecteurs suivants et qui fait appel à explorer.
 ## De manière générale, push! nécéssite que le vecteur dans lequel on veut pusher soit non vide.
 ## J'ajoute donc [0] que je veux shift à la fin (méthode sur les collections qui vire le premier élément)
@@ -162,55 +149,54 @@ end
 
 function DFS(G::Array{Int64,1},n::Int64,ss_cycle::Array{Int64,1},etat::Array{Int64,1},pere::Array{Int64,1})
     ss_cycle = push!(ss_cycle,n)
-    println("ss_cycle : ", ss_cycle)
-    println("       DFS Sommet départ : ", n)
-    println("       @ DFS Ajouter sommet courant ici (",n,") au sous cycle " )
+    #println("ss_cycle : ", ss_cycle)
+    #println("       DFS Sommet départ : ", n)
+    #println("       @ DFS Ajouter sommet courant ici (",n,") au sous cycle " )
     etat[n] = 1
-    println("       DFS Etat sommets : ", etat)
+    #println("       DFS Etat sommets : ", etat)
     v = G[n]
-    println("       DFS Sommet successeur de  ",n," :  ", v)
-    println("       DFS Etat père avant appel rec : ",pere)
-    println(v," etat ",etat[v]==0)
+    #println("       DFS Sommet successeur de  ",n," :  ", v)
+    #println("       DFS Etat père avant appel rec : ",pere)
+    #println(v," etat ",etat[v]==0)
     if (etat[v]==0)
-        println("Si v ", v)
-        println("Si n ", n)
+        #println("Si v ", v)
+        #println("Si n ", n)
         pere[v] = n
         DFS(P,v,ss_cycle,etat,pere)
     end
-    println("       DFS Etat après appel rec : ",etat)
-    println("       DFS Père après appel rec : ",pere)
-    println()
+    #println("       DFS Etat après appel rec : ",etat)
+    #println("       DFS Père après appel rec : ",pere)
+    #println()
+    #println("Fin n > ",n)
+    #println("Fin v > ",v)
 
-    println("Fin n > ",n)
-    println("Fin v > ",v)
-
-    println("--------Fin DFS-------")
+    #println("--------Fin DFS-------")
     return ss_cycle
 end
 
 function explorer(G::Array{Int64,1},etat::Array{Int64,1},pere::Array{Int64,1})
     ## On passe le vecteur [[0]] en paramètre pour que l'on puisse pusher à l'intérieur
     cycle = [[0]]
-    println("EXP : Pere avant exploration : ", pere)
-    println("EXP : Etat avant exploration : ", etat)
+    #println("EXP : Pere avant exploration : ", pere)
+    #println("EXP : Etat avant exploration : ", etat)
     for i in 1:nbPoint
-        println("   EXP : Etat de ", i, " : avant exploration : ", etat[i])
+        #println("   EXP : Etat de ", i, " : avant exploration : ", etat[i])
         if (etat[i] ==0)
             pere[i] = 0
             ## On passe le vecteur [0] en paramètre pour que l'on puisse pusher à l'intérieur
             ss_cycle = DFS(G,i,[0],etat,pere)
-            println("=> EXP - ss_cycle retourné avant shift! ", ss_cycle)
+            #println("=> EXP - ss_cycle retourné avant shift! ", ss_cycle)
             ## On vire le [0] ajouté artificiellement précédemment.
             shift!(ss_cycle)
-            println("=> EXP - ss_cycle retourné après shitf! ", ss_cycle)
-            println("Ajouter le sous cycle au cycle ici")
+            #println("=> EXP - ss_cycle retourné après shitf! ", ss_cycle)
+            #println("Ajouter le sous cycle au cycle ici")
             push!(cycle,ss_cycle)
-            println("=> EXP - état cycle ",cycle)
+            #println("=> EXP - état cycle ",cycle)
         end
-        println("   EXP : Etat de ", i, " :  après exploration", etat[i])
+        #println("   EXP : Etat de ", i, " :  après exploration", etat[i])
     end
-    println("EXP : Pere après exploration : ", pere)
-    println("EXP : Etat après exploration : ", etat)
+    #println("EXP : Pere après exploration : ", pere)
+    #println("EXP : Etat après exploration : ", etat)
     ## On vire le [0] ajouté artificiellement précédemment.
     shift!(cycle)
     return cycle
@@ -224,6 +210,110 @@ function ind_min(C::Array{Array{Int64,1},1})
     #println(taille)
     return indmin(taille)
 end
+
+
+#######################################################################
+#######################################################################
+#######################################################################
+#######################################################################
+#######################################################################
+#######################################################################
+
+# C = parseTSP("plat/exemple.dat")
+#C = parseTSP("plat/plat10.dat")
+C = parseTSP("plat/plat20.dat")
+#C = parseTSP("plat/plat30.dat")
+#C = parseTSP("plat/plat40.dat")
+#C = parseTSP("plat/plat50.dat")
+#C = parseTSP("plat/plat60.dat")
+#C = parseTSP("plat/plat70.dat")
+#C = parseTSP("plat/plat80.dat")
+#C = parseTSP("plat/plat90.dat")
+#C = parseTSP("plat/plat100.dat")
+#C = parseTSP("plat/plat110.dat")
+#C = parseTSP("plat/plat120.dat")
+#C = parseTSP("plat/plat130.dat")
+#C = parseTSP("plat/plat140.dat")
+#C = parseTSP("plat/plat150.dat")
+
+
+nbiter = 0
+nbcycle = 0
+m = TSP(C)
+status = solve(m)
+nbiter = 1
+imp(m)
+#######################################################################
+#######################################################################
+while(nbcycle != 1)
+    println("Nombre d'itération(s) : ", nbiter)
+    P = permutation(getvalue(m[:x]))
+    println("Ordre de visite des drônes : ", P)
+    nbPoint = size(P,1)
+    etat = zeros(Int64,nbPoint)
+    pere = zeros(Int64,nbPoint)
+    cycle = explorer(P,etat,pere)
+    println("   Cycle(s) trouvé(s) : ", cycle)
+    nbcycle = length(cycle)
+    println("   Nombre de cycle(s) trouvé(s) : ",nbcycle)
+    if (nbcycle!= 1)
+        ind = ind_min(cycle)
+        ## cycle à détruire.
+        destr = cycle[ind]
+        println("   Cycle à casser : ", destr)
+        if (length(destr) == 2)
+            println("!!!! Cycle à casser de taille 2")
+            i = destr[1]
+            j = destr[2]
+            x=m[:x]
+            expr = AffExpr()
+            push!(expr,1.0,x[i,j])
+            push!(expr,1.0,x[j,i])
+
+        else
+            println("!!!! Cycle à casser de taille ", length(destr))
+            i = destr[1]
+            j = destr[2]
+            k = destr[3]
+            x=m[:x]
+            expr = AffExpr()
+            push!(expr,1.0,x[i,j])
+            push!(expr,1.0,x[j,k])
+            push!(expr,1.0,x[k,i])
+        end
+        ## @constraint(m::Model, con) - add linear or quadratic constraints.
+        con = @constraint(m,expr <= 1)
+        nbiter = nbiter + 1
+        status = solve(m)
+        imp(m)
+    else
+        println("OPTIMUM ATTEINT")
+        println("Nombre de points : ", length(P))
+        println("Nombre d'itération(s) : ", nbiter)
+        imp(m)
+        println("Ordre de visite des drônes : ", P)
+
+    end
+end
+#######################################################################
+#######################################################################
+#######################################################################
+#######################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -240,7 +330,7 @@ status = solve(m)
 imp(m)
 
 ## Attention : xval ne sont pas les variables de décisions mais les valeurs de variables - xval est un alias bien pratique
-
+## x représente les variables de décision du modèle :
 xval = getvalue(m[:x])
 P=permutation(xval)
 =#
@@ -251,6 +341,7 @@ P=permutation(xval)
     pere = zeros(Int64,nbPoint)
 
     cycle = explorer(P,etat,pere)
+    ## tester ici nbcycle = length(cycle)
 
 =#
 #=
@@ -296,7 +387,9 @@ length(cycle)
 
 
 CONTINUER A TROUVER LES CYCLES ET SOLVER LE PROBLEME TANT QUE LE NOMBRE DE CYCLE EST DIFFERENT DE 1
-## NECESSITE UNE AUTOMATISATION A BASE DE TANT QUE
+## NECESSITE UNE AUTOMATISATION A BASE DE TANT QUE.
+Idée : au début, pour initialiser la boucle, on peut définir le compteur nbcycle = 0.
+Tant quu'il n'y a pas au moins un cycle. continuer le processus de suppression
 
 
 
