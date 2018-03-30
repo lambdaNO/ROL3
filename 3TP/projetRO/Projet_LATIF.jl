@@ -226,9 +226,9 @@ end
 #######################################################################
 #######################################################################
 
-# C = parseTSP("plat/exemple.dat")
+#C = parseTSP("plat/exemple.dat")
 #C = parseTSP("plat/plat10.dat")
-C = parseTSP("plat/plat20.dat")
+#C = parseTSP("plat/plat20.dat")
 #C = parseTSP("plat/plat30.dat")
 #C = parseTSP("plat/plat40.dat")
 #C = parseTSP("plat/plat50.dat")
@@ -242,6 +242,18 @@ C = parseTSP("plat/plat20.dat")
 #C = parseTSP("plat/plat130.dat")
 #C = parseTSP("plat/plat140.dat")
 #C = parseTSP("plat/plat150.dat")
+
+#C = parseTSP("relief/relief10.dat")
+
+
+C = parseTSP("relief/relief150.dat")
+
+#######################################################################
+#######################################################################
+#######################################################################
+##########################EXACTE#######################################
+#######################################################################
+#######################################################################
 
 
 nbiter = 1
@@ -302,7 +314,7 @@ end
 ################################################################################
 ################################################################################
 ## Au sortir de la boucle, on est sûr d'avoir casser tous les sous cycles et de n'avoir qu'un seul cycle
-println("FIN - Problème résolu à l'optimalité")
+println("FIN - Problème résolu :")
 imp(m)
 println("> Nombre d'itération nécéssaires : ", nbiter)
 println("> Ordre de parcours des drônes : ")
@@ -310,16 +322,51 @@ imp_cycle(cycle[1])
 
 
 
-
 #######################################################################
 #######################################################################
 #######################################################################
 #######################################################################
+#=
+function plusprochevoisin(C::Array{Int64,2})
+    println(C)
+    nbPoint = size(C,1)
+    ## On fixe par défaut le point (1,1) de la matrice.
+    ## Etat 1 : Visité - Etat 0 : Non visité
+    etat = zeros(Int64,nbPoint)
+    pere = zeros(Int64,nbPoint)
+    fils = zeros(Int64,nbPoint)
+    println("etat = ", etat)
+    println("pere = ", pere)
+    println("fils = ", fils)
+
+    ## Récupération des min d'une ligne.
+
+    ## Acceder au minimum de la ligne 1
+    i = 1
+    t = indmin(C[1,:])
+
+    etat[i]=1
+    pere[t]=i
+    fils[i] = t
+
+    println("--")
+    println("etat = ", etat)
+    println("pere = ", pere)
+    println("fils = ", fils)
+
+    println("--")
+
+    println(t)
+    x = indmin(C[t,:])
+    println(x)
+
+end
 
 
+getvalue(m[:x])
 
-
-
+plusprochevoisin(C)
+=#
 
 
 
