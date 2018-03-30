@@ -59,7 +59,7 @@ end
 
 function imp(m::Model)
     if status == :Optimal
-        println("temps total = ",getobjectivevalue(m))
+        println("> temps total = ",getobjectivevalue(m))
         #println("Ordre de visite des points :", permutation(getvalue(m[:x])))
     elseif status == :Unbounded
         println("Problème non-borné")
@@ -211,6 +211,13 @@ function ind_min(C::Array{Array{Int64,1},1})
     return indmin(taille)
 end
 
+function imp_cycle(C::Array{Int64,1})
+    for i = 1:length(C)
+        print(C[i]," -> ")
+    end
+    print(C[1],". ")
+end
+
 
 #######################################################################
 #######################################################################
@@ -237,64 +244,73 @@ C = parseTSP("plat/plat20.dat")
 #C = parseTSP("plat/plat150.dat")
 
 
-nbiter = 0
+nbiter = 1
 nbcycle = 0
+println("Itération n° ",nbiter)
 m = TSP(C)
 status = solve(m)
 nbiter = 1
 imp(m)
+P = permutation(getvalue(m[:x]))
+nbPoint = size(P,1)
+etat = zeros(Int64,nbPoint)
+pere = zeros(Int64,nbPoint)
+cycle = explorer(P,etat,pere)
+println("> Cycle(s) trouvé(s) : ", cycle)
+nbcycle = length(cycle)
+println("> Nombre de cycle(s) trouvé(s) : ",nbcycle)
+println()
 #######################################################################
 #######################################################################
-while(nbcycle != 1)
-    println("Nombre d'itération(s) : ", nbiter)
+while(nbcycle!= 1)
+    println("Itération n° ", nbiter," Cassage de contrainte ")
+    ind = ind_min(cycle)
+    aCasser = cycle[ind]
+    ## ex : aCasser = [5, 8, 14, 13, 15]
+    println("> Cycle à casser : ", aCasser)
+    ## Récupérer la taille du cycle
+    tailleACasser = length(aCasser)
+    println("> Taille du cycle à casser : ", tailleACasser)
+    ## Ajouter le premier élément du cycle à casser pour que aCasser forme un cycle (x,y,...,z,x)
+    push!(aCasser,aCasser[1])
+    ## On créait alors les différentes composantes de la contrainte à casser
+    x=m[:x]
+    expr = AffExpr()
+    i = 1
+    while (i <= tailleACasser )
+        push!(expr,1.0,x[aCasser[i],aCasser[i+1]])
+        i = i + 1
+    end
+    con = @constraint(m,expr <= (tailleACasser - 1))
+    println("> Nouvelle contrainte : ", con)
+    println()
+    println("> Nouvelle résolution après ajout de la nouvelle contrainte !")
+    nbiter = nbiter + 1
+    status = solve(m)
+    imp(m)
+    ############################################################################
     P = permutation(getvalue(m[:x]))
-    println("Ordre de visite des drônes : ", P)
     nbPoint = size(P,1)
     etat = zeros(Int64,nbPoint)
     pere = zeros(Int64,nbPoint)
     cycle = explorer(P,etat,pere)
-    println("   Cycle(s) trouvé(s) : ", cycle)
+    println("> Cycle(s) trouvé(s) : ", cycle)
     nbcycle = length(cycle)
-    println("   Nombre de cycle(s) trouvé(s) : ",nbcycle)
-    if (nbcycle!= 1)
-        ind = ind_min(cycle)
-        ## cycle à détruire.
-        destr = cycle[ind]
-        println("   Cycle à casser : ", destr)
-        if (length(destr) == 2)
-            println("!!!! Cycle à casser de taille 2")
-            i = destr[1]
-            j = destr[2]
-            x=m[:x]
-            expr = AffExpr()
-            push!(expr,1.0,x[i,j])
-            push!(expr,1.0,x[j,i])
-
-        else
-            println("!!!! Cycle à casser de taille ", length(destr))
-            i = destr[1]
-            j = destr[2]
-            k = destr[3]
-            x=m[:x]
-            expr = AffExpr()
-            push!(expr,1.0,x[i,j])
-            push!(expr,1.0,x[j,k])
-            push!(expr,1.0,x[k,i])
-        end
-        ## @constraint(m::Model, con) - add linear or quadratic constraints.
-        con = @constraint(m,expr <= 1)
-        nbiter = nbiter + 1
-        status = solve(m)
-        imp(m)
-    else
-        println("OPTIMUM ATTEINT")
-        println("Nombre de points : ", length(P))
-        println("Nombre d'itération(s) : ", nbiter)
-        imp(m)
-        println("Ordre de visite des drônes : ", P)
-
-    end
+    println("> Nombre de cycle(s) trouvé(s) : ",nbcycle)
+    println()
 end
+################################################################################
+################################################################################
+## Au sortir de la boucle, on est sûr d'avoir casser tous les sous cycles et de n'avoir qu'un seul cycle
+println("FIN - Problème résolu à l'optimalité")
+imp(m)
+println("> Nombre d'itération nécéssaires : ", nbiter)
+println("> Ordre de parcours des drônes : ")
+imp_cycle(cycle[1])
+
+
+
+
 #######################################################################
 #######################################################################
 #######################################################################
@@ -384,6 +400,9 @@ pere = zeros(Int64,nbPoint)
 
 cycle = explorer(P,etat,pere)
 length(cycle)
+
+
+
 
 
 CONTINUER A TROUVER LES CYCLES ET SOLVER LE PROBLEME TANT QUE LE NOMBRE DE CYCLE EST DIFFERENT DE 1
