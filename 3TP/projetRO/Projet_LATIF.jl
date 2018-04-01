@@ -1,6 +1,7 @@
 
-#= NOM1 - Prénom 1
-   NOM2 - Prénom 2
+#= LATIF - Mehdi
+   681 - Maths info
+   Life on Mars - Licence 3 - 2017/2018
    N'oubliez pas de modifier ce commentaire, ainsi que le nom du fichier! =#
 
 using JuMP, GLPKMathProgInterface
@@ -216,6 +217,7 @@ function imp_cycle(C::Array{Int64,1})
         print(C[i]," -> ")
     end
     print(C[1],". ")
+    println()
 end
 
 
@@ -246,16 +248,16 @@ end
 #C = parseTSP("relief/relief10.dat")
 
 
-C = parseTSP("relief/relief150.dat")
+#C = parseTSP("relief/relief150.dat")
 
-#######################################################################
-#######################################################################
-#######################################################################
-##########################EXACTE#######################################
-#######################################################################
-#######################################################################
-
-
+################################################################################
+################################################################################
+################################################################################
+##########################    EXACTE  ##########################################
+################################################################################
+################################################################################
+################################################################################
+#=
 nbiter = 1
 nbcycle = 0
 println("Itération n° ",nbiter)
@@ -319,54 +321,102 @@ imp(m)
 println("> Nombre d'itération nécéssaires : ", nbiter)
 println("> Ordre de parcours des drônes : ")
 imp_cycle(cycle[1])
+=#
 
 
 
-#######################################################################
-#######################################################################
-#######################################################################
-#######################################################################
-#=
-function plusprochevoisin(C::Array{Int64,2})
-    println(C)
-    nbPoint = size(C,1)
-    ## On fixe par défaut le point (1,1) de la matrice.
-    ## Etat 1 : Visité - Etat 0 : Non visité
+################################################################################
+################################################################################
+################################################################################
+################################################################################
+
+
+
+################################################################################
+################################################################################
+################################################################################
+##########################    APPROCHÉE  #######################################
+################################################################################
+################################################################################
+################################################################################
+## ATTENTION DANS CE CAS LÀ, LE DISTANCIER DOIT ÊTRE SYMÉTRIQUE
+
+
+
+
+function procheVoisin(X::Array{Int64,2},dep::Int64)
+    #dep = 1
+    nbPoint = size(X,1)
+    ## Matrice des points visités
     etat = zeros(Int64,nbPoint)
-    pere = zeros(Int64,nbPoint)
-    fils = zeros(Int64,nbPoint)
-    println("etat = ", etat)
-    println("pere = ", pere)
-    println("fils = ", fils)
+    ## Matrice des successeurs
+    succ = zeros(Int64,nbPoint)
+    ### Sauvegarder le point de départ.
+    x = dep
+    ### Initialisation d'un vecteur parc permettant de vérifier le parcours obtenu
+    parc = [x]
+    ### Initialisation de la variable de boucle - comparaison du min
+    m = 0
 
-    ## Récupération des min d'une ligne.
 
-    ## Acceder au minimum de la ligne 1
-    i = 1
-    t = indmin(C[1,:])
+    while (m!= 10000)
+        println("Recherche du succ de ", x)
+        println(X[x,:])
+        println("Min de la ligne ",x," = ", minimum(X[x,:]), " atteint au point ", indmin(X[x,:]))
+        t = indmin(X[x,:])
+        X[:,x] = 10000
+        succ[x] = t
+        etat[x] = 1
+        push!(parc,t)
+        println("E : ", etat)
+        println("S : ", succ)
+        println("P : ", parc)
+        x = t
+        m = minimum(X[x,:])
+    end
+    println("Dernier point visité ", x)
+    etat[x] = 1
+    succ[x] = dep
+    push!(parc,dep)
+    println("E : ", etat)
+    println("S : ", succ)
+    println("P : ", parc)
 
-    etat[i]=1
-    pere[t]=i
-    fils[i] = t
-
-    println("--")
-    println("etat = ", etat)
-    println("pere = ", pere)
-    println("fils = ", fils)
-
-    println("--")
-
-    println(t)
-    x = indmin(C[t,:])
-    println(x)
-
+    return parc
+    #return succ
 end
 
 
-getvalue(m[:x])
+function calculCout(X::Array{Int64,2},V::Array{Int64,1})
+    T = 0
+    nbPoint = size(V,1)
+    i = 1
+    while i < nbPoint
+        println("i = " , V[i], "| i+1 = ", V[i + 1])
+        println("Cout arc (",V[i],",",V[i+1],") = ", X[V[i],V[i+1]])
+        T = T + X[V[i],V[i+1]]
+        i = i + 1
+    end
+    println(T)
+    return T
+end
 
-plusprochevoisin(C)
-=#
+
+## GROS SOUCI DE MON IMPLEMENTATION - C'EST QUE JE DÉGRADE LA MATRICE SUR LAQUELLE J'EFFECTUE MA RECHERCHE DE VOISIN
+C = parseTSP("plat/exemple.dat")
+## Création d'une copie de la matrice pour pouvoir travailler dessus
+X = parseTSP("plat/exemple.dat")
+parc = procheVoisin(X,1)
+## pour exemple.dat on obtient bien [1, 7, 4, 3, 6, 2, 5, 1]
+T = calculCout(C,parc)
+## pour exemple.dat on obtient bien T = 2586
+
+
+
+
+
+
+
 
 
 
