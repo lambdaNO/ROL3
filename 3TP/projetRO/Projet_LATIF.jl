@@ -41,20 +41,21 @@ function TSP(C::Array{Int64,2})
         On part de la ville i une seule et unique fois
     =#
     ## @constraint(m,ctrDepart[i=1:nbPoint],sum(x[i,j] for j in 1:nbPoint,if j != i) ==1) ## A tester écriture du prof ,if j != i
-    @constraint(m,ctrDepart[i=1:nbPoint],sum(x[i,j] for j in 1:nbPoint) ==1)
+    @constraint(m,ctrDepart[i=1:nbPoint],sum(x[i,j] for j in 1:nbPoint if i!=j) ==1)
     #=
         Contrainte 2
         On arrive à la ville j une seule et unique fois
     =#
-    @constraint(m,ctrArrivee[j=1:nbPoint],sum(x[i,j] for i in 1:nbPoint)==1)
+    @constraint(m,ctrArrivee[j=1:nbPoint],sum(x[i,j] for i in 1:nbPoint if i!=j)==1)
     #=
         Contrainte 3 - ajout des i!=j
-    =#
+
     @constraint(m,ctr2i[i=1:nbPoint],x[i,i]==0)
-    #=
+
         Contrainte 4 - Probablement redondante avec la contrainte 3
-    =#
+
     @constraint(m,ctr2j[j=1:nbPoint],x[j,j]==0)
+    =#
     return m
 end
 
@@ -76,14 +77,15 @@ end
 function scriptTSP()
     # Première exécution sur l'exemple pour forcer la compilation si elle n'a pas encore été exécutée
     C = parseTSP("plat/exemple.dat")
-    TSP(C)
+    #TSP(C)
 
     # Série d'exécution avec mesure du temps pour les instances symétriques
     for i in 10:10:150
         file = "plat/plat" * string(i) * ".dat"
         C = parseTSP(file)
         println("Instance à résoudre : plat",i,".dat")
-        @time TSP(C)
+        #@time TSP(C)
+        @time main()
     end
 
     # Série d'exécution avec mesure du temps pour les instances asymétriques
@@ -93,6 +95,7 @@ function scriptTSP()
         C = parseTSP(file)
         @time TSP(C)
     end
+
 end
 
 # fonction qui prend en paramètre un fichier contenant un distancier et qui retourne le tableau bidimensionnel correspondant
@@ -227,7 +230,7 @@ end
 #######################################################################
 #######################################################################
 #######################################################################
-
+#function mainExacte()
 #C = parseTSP("plat/exemple.dat")
 #C = parseTSP("plat/plat10.dat")
 #C = parseTSP("plat/plat20.dat")
@@ -258,51 +261,15 @@ end
 ################################################################################
 ################################################################################
 #=
-nbiter = 1
-nbcycle = 0
-println("Itération n° ",nbiter)
-m = TSP(C)
-status = solve(m)
-nbiter = 1
-imp(m)
-P = permutation(getvalue(m[:x]))
-nbPoint = size(P,1)
-etat = zeros(Int64,nbPoint)
-pere = zeros(Int64,nbPoint)
-cycle = explorer(P,etat,pere)
-println("> Cycle(s) trouvé(s) : ", cycle)
-nbcycle = length(cycle)
-println("> Nombre de cycle(s) trouvé(s) : ",nbcycle)
-println()
-#######################################################################
-#######################################################################
-while(nbcycle!= 1)
-    println("Itération n° ", nbiter," Cassage de contrainte ")
-    ind = ind_min(cycle)
-    aCasser = cycle[ind]
-    ## ex : aCasser = [5, 8, 14, 13, 15]
-    println("> Cycle à casser : ", aCasser)
-    ## Récupérer la taille du cycle
-    tailleACasser = length(aCasser)
-    println("> Taille du cycle à casser : ", tailleACasser)
-    ## Ajouter le premier élément du cycle à casser pour que aCasser forme un cycle (x,y,...,z,x)
-    push!(aCasser,aCasser[1])
-    ## On créait alors les différentes composantes de la contrainte à casser
-    x=m[:x]
-    expr = AffExpr()
-    i = 1
-    while (i <= tailleACasser )
-        push!(expr,1.0,x[aCasser[i],aCasser[i+1]])
-        i = i + 1
-    end
-    con = @constraint(m,expr <= (tailleACasser - 1))
-    println("> Nouvelle contrainte : ", con)
-    println()
-    println("> Nouvelle résolution après ajout de la nouvelle contrainte !")
-    nbiter = nbiter + 1
+@time begin
+    #C =  parseTSP(S)
+    nbiter = 1
+    nbcycle = 0
+    println("Itération n° ",nbiter)
+    m = TSP(C)
     status = solve(m)
+    nbiter = 1
     imp(m)
-    ############################################################################
     P = permutation(getvalue(m[:x]))
     nbPoint = size(P,1)
     etat = zeros(Int64,nbPoint)
@@ -312,18 +279,57 @@ while(nbcycle!= 1)
     nbcycle = length(cycle)
     println("> Nombre de cycle(s) trouvé(s) : ",nbcycle)
     println()
+#######################################################################
+#######################################################################
+    while(nbcycle!= 1)
+        println("Itération n° ", nbiter," Cassage de contrainte ")
+        ind = ind_min(cycle)
+        aCasser = cycle[ind]
+        ## ex : aCasser = [5, 8, 14, 13, 15]
+        println("> Cycle à casser : ", aCasser)
+        ## Récupérer la taille du cycle
+        tailleACasser = length(aCasser)
+        println("> Taille du cycle à casser : ", tailleACasser)
+        ## Ajouter le premier élément du cycle à casser pour que aCasser forme un cycle (x,y,...,z,x)
+        push!(aCasser,aCasser[1])
+        ## On créait alors les différentes composantes de la contrainte à casser
+        x=m[:x]
+        expr = AffExpr()
+        i = 1
+        while (i <= tailleACasser )
+            push!(expr,1.0,x[aCasser[i],aCasser[i+1]])
+
+            i = i + 1
+        end
+        con = @constraint(m,expr <= (tailleACasser - 1))
+        println("> Nouvelle contrainte : ", con)
+        println()
+        println("> Nouvelle résolution après ajout de la nouvelle contrainte !")
+        nbiter = nbiter + 1
+        status = solve(m)
+        imp(m)
+        ############################################################################
+        P = permutation(getvalue(m[:x]))
+        nbPoint = size(P,1)
+        etat = zeros(Int64,nbPoint)
+        pere = zeros(Int64,nbPoint)
+        cycle = explorer(P,etat,pere)
+        println("> Cycle(s) trouvé(s) : ", cycle)
+        nbcycle = length(cycle)
+        println("> Nombre de cycle(s) trouvé(s) : ",nbcycle)
+        println()
+    end
+    ################################################################################
+    ################################################################################
+    ## Au sortir de la boucle, on est sûr d'avoir casser tous les sous cycles et de n'avoir qu'un seul cycle
+    println("FIN - Problème résolu :")
+    imp(m)
+    println("> Nombre d'itération nécéssaires : ", nbiter)
+    println("> Ordre de parcours des drônes : ")
+    imp_cycle(cycle[1])
+
 end
-################################################################################
-################################################################################
-## Au sortir de la boucle, on est sûr d'avoir casser tous les sous cycles et de n'avoir qu'un seul cycle
-println("FIN - Problème résolu :")
-imp(m)
-println("> Nombre d'itération nécéssaires : ", nbiter)
-println("> Ordre de parcours des drônes : ")
-imp_cycle(cycle[1])
 =#
-
-
 
 ################################################################################
 ################################################################################
@@ -340,10 +346,7 @@ imp_cycle(cycle[1])
 ################################################################################
 ################################################################################
 ## ATTENTION DANS CE CAS LÀ, LE DISTANCIER DOIT ÊTRE SYMÉTRIQUE
-
-
-
-
+#=
 function procheVoisin(X::Array{Int64,2},dep::Int64)
     #dep = 1
     nbPoint = size(X,1)
@@ -382,36 +385,132 @@ function procheVoisin(X::Array{Int64,2},dep::Int64)
     println("S : ", succ)
     println("P : ", parc)
 
-    return parc
-    #return succ
+    #return parc
+    return succ
 end
-
-
-function calculCout(X::Array{Int64,2},V::Array{Int64,1})
+#=
+function calculCout(C::Array{Int64,2},P::Array{Int64,1})
     T = 0
-    nbPoint = size(V,1)
+    nbPoint = size(P,1)
     i = 1
-    while i < nbPoint
-        println("i = " , V[i], "| i+1 = ", V[i + 1])
-        println("Cout arc (",V[i],",",V[i+1],") = ", X[V[i],V[i+1]])
-        T = T + X[V[i],V[i+1]]
+    x = 1
+    while i <= nbPoint
+        println("i = " , x, " | i+1 = ", P[x])
+        println("   Cout arc (",x,",",P[x],") = ", C[x,P[x]])
+        T = T + C[x,P[x]]
+        println("   CumSum ", T)
         i = i + 1
+        x = P[x]
     end
-    println(T)
     return T
 end
+=#
+
+
+
+###############################################################
+###############################################################
+###############################################################
+## Pour tout sommet xi de H faire
+
+
+### Etape 1 : on va déjà lui demander qu'à partir d'un sommet, il affiche le sommet des autres
+### On est sur des cycles - On sait que ça termine.
+### On connait le nombre d'arc dans ce graphe (c'est nbSommet - 1)
+#dep = 1
+#x = P[dep]
+
+function opt2(X::Array{Int64,1})
+    nbSommet = size(X,1)
+    ## Le point de départ
+    x = 1
+    amelio = false
+    println("Parcours de base :")
+    println(P)
+    println("##################")
+    cpt = 1
+    while (amelio == false && cpt <= nbSommet)
+        #amelio = false
+        for i in 1:nbSommet
+            #println("x = ", x , "| P[x] = ", P[x])
+            #println("Arc Base : (", x,",",P[x],")")
+                #y =P[x]
+                y = P[P[x]]
+                for j in 1:nbSommet-3
+                    #println("   y = ", y,"| P[y] = ", P[y])
+                    #println("   Arc Pivot : (", y,",",P[y],")")
+                    ###########################################
+                    ### Etude Delta :
+                    delta = 0
+                    # arête (i,j) = (x,P[x])
+                    # arête (i',j') = (y,P[y])- non consécutive à (i,j)
+                    #println("       Arêtes étudiées (i = ",x,",j = ",P[x],") et (i' = ",y,", j' = ",P[y],").")
+                    ## Cii' : C1
+                    #println("          Cii' => Coût (",x,",",y,") = ", C[x,y])
+                    C1 = C[x,y]
+                    ## Cjj' : C2
+                    #println("          Cjj' => Coût (",P[x],",",P[y],") = ", C[P[x],P[y]])
+                    C2 = C[P[x],P[y]]
+                    ## Cij : C3
+                    #println("          Cij => Coût (",x,",",P[x],") = ", C[x,P[x]])
+                    C3 = C[x,P[x]]
+                    ## Ci'j' : C4
+                    #println("          Ci'j' => Coût (",y,",",P[y],") = ", C[y,P[y]])
+                    C4 = C[y,P[y]]
+                    ## Delta = A + B - C - D
+                    delta = C1 + C2 - C3 - C4
+                    println("           Δ((",x,",",P[x],");(",y,",",P[y],") = ", delta)
+                    if (delta < 0 )
+                        println("Solution améliorante : : ")
+                        println(P)
+                        println("           Δ((i = ",x,", j = ",P[x],");(i' = ",y,", j' = ",P[y],") = ", delta)
+                        ## Modication à effectuer :
+                        ### (i=x,j=P[x]) devient (i=x,i'=y) (1)
+                        ### (i'=y,j'=P[y]) devient (j=P[x],j'=P[y])
+                        ### CF Image Tableau
+                        #println("i - x = ", x)
+                        #println("j - P[x]= ",P[x])
+                        #println("i' - y = ", y)
+                        #println("j' - P[y]= ",P[y])
+
+                        ########
+                        #tmpx = P[x]
+                        tmpy = P[y]
+                        P[y]=P[x]
+                        P[x] = y
+                        P[P[y]] = tmpy
+                        println(P)
+                        amelio = true
+                    end
+                ###########################################
+                    y = P[y]
+                end
+                x = P[x]
+            end
+            println(P)
+            #calculCout(C,P)
+            cpt = 1 + cpt
+    end
+    return X
+end
+
+
+
 
 
 ## GROS SOUCI DE MON IMPLEMENTATION - C'EST QUE JE DÉGRADE LA MATRICE SUR LAQUELLE J'EFFECTUE MA RECHERCHE DE VOISIN
-C = parseTSP("plat/exemple.dat")
+C = parseTSP("plat/plat10.dat"))
 ## Création d'une copie de la matrice pour pouvoir travailler dessus
-X = parseTSP("plat/exemple.dat")
-parc = procheVoisin(X,1)
-## pour exemple.dat on obtient bien [1, 7, 4, 3, 6, 2, 5, 1]
-T = calculCout(C,parc)
-## pour exemple.dat on obtient bien T = 2586
+X = parseTSP("plat/plat10.dat"))
 
 
+P = procheVoisin(X,1)
+T = calculCout(C,P)
+O = opt2(P)
+F = calculCout(C,O)
+## Variation constaté
+Var = T - F
+println("Delta coût : ", Var )
 
 
 

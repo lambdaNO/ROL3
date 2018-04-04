@@ -76,8 +76,7 @@ function calculCout(C::Array{Int64,2},P::Array{Int64,1})
 end
 
 
-P = procheVoisin(X,1)
-T = calculCout(C,P)
+
 
 ###############################################################
 ###############################################################
@@ -90,71 +89,89 @@ T = calculCout(C,P)
 ### On connait le nombre d'arc dans ce graphe (c'est nbSommet - 1)
 #dep = 1
 #x = P[dep]
-nbSommet = size(P,1)
-## Le point de départ
-x = 1
-amelio = false
-println("Parcours de base :")
-println(P)
-println("##################")
-while (amelio == false)
-    #amelio = false
-    for i in 1:nbSommet
-        #println("x = ", x , "| P[x] = ", P[x])
-        #println("Arc Base : (", x,",",P[x],")")
-            #y =P[x]
-            y = P[P[x]]
-            for j in 1:nbSommet-3
-                #println("   y = ", y,"| P[y] = ", P[y])
-                #println("   Arc Pivot : (", y,",",P[y],")")
-                ###########################################
-                ### Etude Delta :
-                delta = 0
-                # arête (i,j) = (x,P[x])
-                # arête (i',j') = (y,P[y])- non consécutive à (i,j)
-                #println("       Arêtes étudiées (i = ",x,",j = ",P[x],") et (i' = ",y,", j' = ",P[y],").")
-                ## Cii' : C1
-                #println("          Cii' => Coût (",x,",",y,") = ", C[x,y])
-                C1 = C[x,y]
-                ## Cjj' : C2
-                #println("          Cjj' => Coût (",P[x],",",P[y],") = ", C[P[x],P[y]])
-                C2 = C[P[x],P[y]]
-                ## Cij : C3
-                #println("          Cij => Coût (",x,",",P[x],") = ", C[x,P[x]])
-                C3 = C[x,P[x]]
-                ## Ci'j' : C4
-                #println("          Ci'j' => Coût (",y,",",P[y],") = ", C[y,P[y]])
-                C4 = C[y,P[y]]
-                ## Delta = A + B - C - D
-                delta = C1 + C2 - C3 - C4
-                println("           Δ((",x,",",P[x],");(",y,",",P[y],") = ", delta)
-                if (delta < 0 )
-                    println("Solution améliorante : : ")
-                    println(P)
-                    println("           Δ((i = ",x,", j = ",P[x],");(i' = ",y,", j' = ",P[y],") = ", delta)
-                    ## Modication à effectuer :
-                    ### (i=x,j=P[x]) devient (i=x,i'=y) (1)
-                    ### (i'=y,j'=P[y]) devient (j=P[x],j'=P[y])
-                    ### CF Image Tableau
-                    #println("i - x = ", x)
-                    #println("j - P[x]= ",P[x])
-                    #println("i' - y = ", y)
-                    #println("j' - P[y]= ",P[y])
 
-                    ########
-                    #tmpx = P[x]
-                    tmpy = P[y]
-                    P[y]=P[x]
-                    P[x] = y
-                    P[P[y]] = tmpy
-                    println(P)
-                    amelio = true
+function opt2(X::Array{Int64,1})
+    nbSommet = size(X,1)
+    ## Le point de départ
+    x = 1
+    amelio = false
+    println("Parcours de base :")
+    println(P)
+    println("##################")
+    cpt = 1
+    while (amelio == false && cpt <= nbSommet)
+        #amelio = false
+        for i in 1:nbSommet
+            #println("x = ", x , "| P[x] = ", P[x])
+            #println("Arc Base : (", x,",",P[x],")")
+                #y =P[x]
+                y = P[P[x]]
+                for j in 1:nbSommet-3
+                    #println("   y = ", y,"| P[y] = ", P[y])
+                    #println("   Arc Pivot : (", y,",",P[y],")")
+                    ###########################################
+                    ### Etude Delta :
+                    delta = 0
+                    # arête (i,j) = (x,P[x])
+                    # arête (i',j') = (y,P[y])- non consécutive à (i,j)
+                    #println("       Arêtes étudiées (i = ",x,",j = ",P[x],") et (i' = ",y,", j' = ",P[y],").")
+                    ## Cii' : C1
+                    #println("          Cii' => Coût (",x,",",y,") = ", C[x,y])
+                    C1 = C[x,y]
+                    ## Cjj' : C2
+                    #println("          Cjj' => Coût (",P[x],",",P[y],") = ", C[P[x],P[y]])
+                    C2 = C[P[x],P[y]]
+                    ## Cij : C3
+                    #println("          Cij => Coût (",x,",",P[x],") = ", C[x,P[x]])
+                    C3 = C[x,P[x]]
+                    ## Ci'j' : C4
+                    #println("          Ci'j' => Coût (",y,",",P[y],") = ", C[y,P[y]])
+                    C4 = C[y,P[y]]
+                    ## Delta = A + B - C - D
+                    delta = C1 + C2 - C3 - C4
+                    println("           Δ((",x,",",P[x],");(",y,",",P[y],") = ", delta)
+                    if (delta < 0 )
+                        println("Solution améliorante : : ")
+                        println(P)
+                        println("           Δ((i = ",x,", j = ",P[x],");(i' = ",y,", j' = ",P[y],") = ", delta)
+                        ## Modication à effectuer :
+                        ### (i=x,j=P[x]) devient (i=x,i'=y) (1)
+                        ### (i'=y,j'=P[y]) devient (j=P[x],j'=P[y])
+                        ### CF Image Tableau
+                        #println("i - x = ", x)
+                        #println("j - P[x]= ",P[x])
+                        #println("i' - y = ", y)
+                        #println("j' - P[y]= ",P[y])
+
+                        ########
+                        #tmpx = P[x]
+                        tmpy = P[y]
+                        P[y]=P[x]
+                        P[x] = y
+                        P[P[y]] = tmpy
+                        println(P)
+                        amelio = true
+                    end
+                ###########################################
+                    y = P[y]
                 end
-            ###########################################
-                y = P[y]
+                x = P[x]
             end
-            x = P[x]
-        end
-        println(P)
-        calculCout(C,P)
+            println(P)
+            #calculCout(C,P)
+            cpt = 1 + cpt
+    end
+    return X
 end
+
+
+#C = parseTSP("relief/relief150.dat")
+#X = parseTSP("relief/relief150.dat")
+
+P = procheVoisin(X,1)
+T = calculCout(C,P)
+O = opt2(P)
+F = calculCout(C,O)
+## Variation constaté
+Var = T - F
+println("Delta coût : ", Var )
