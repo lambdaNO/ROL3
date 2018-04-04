@@ -230,7 +230,7 @@ end
 #######################################################################
 #######################################################################
 #######################################################################
-#function mainExacte()
+
 #C = parseTSP("plat/exemple.dat")
 #C = parseTSP("plat/plat10.dat")
 #C = parseTSP("plat/plat20.dat")
@@ -250,7 +250,6 @@ end
 
 #C = parseTSP("relief/relief10.dat")
 
-
 #C = parseTSP("relief/relief150.dat")
 
 ################################################################################
@@ -265,7 +264,7 @@ end
     #C =  parseTSP(S)
     nbiter = 1
     nbcycle = 0
-    println("Itération n° ",nbiter)
+    println("Résolution d'initiale :  ")
     m = TSP(C)
     status = solve(m)
     nbiter = 1
@@ -330,7 +329,6 @@ end
 
 end
 =#
-
 ################################################################################
 ################################################################################
 ################################################################################
@@ -346,7 +344,31 @@ end
 ################################################################################
 ################################################################################
 ## ATTENTION DANS CE CAS LÀ, LE DISTANCIER DOIT ÊTRE SYMÉTRIQUE
+
+
+
 #=
+C = [
+10000	786	549	657	331	559	250;
+786	10000	668	979	593	224	905;
+549	668	10000	316	607	472	467;
+657	979	316	10000	890	769	400;
+331	593	607	890	10000	386	559;
+559	224	472	769	386	10000	681;
+250	905	467	400	559	681	10000;
+]
+X = [
+10000	786	549	657	331	559	250;
+786	10000	668	979	593	224	905;
+549	668	10000	316	607	472	467;
+657	979	316	10000	890	769	400;
+331	593	607	890	10000	386	559;
+559	224	472	769	386	10000	681;
+250	905	467	400	559	681	10000;
+]
+=#
+
+
 function procheVoisin(X::Array{Int64,2},dep::Int64)
     #dep = 1
     nbPoint = size(X,1)
@@ -371,69 +393,56 @@ function procheVoisin(X::Array{Int64,2},dep::Int64)
         succ[x] = t
         etat[x] = 1
         push!(parc,t)
-        println("E : ", etat)
-        println("S : ", succ)
-        println("P : ", parc)
+        #println("E : ", etat)
+        #println("S : ", succ)
+        #println("P : ", parc)
         x = t
         m = minimum(X[x,:])
     end
-    println("Dernier point visité ", x)
+    #println("Dernier point visité ", x)
     etat[x] = 1
     succ[x] = dep
     push!(parc,dep)
-    println("E : ", etat)
-    println("S : ", succ)
-    println("P : ", parc)
+    #println("E : ", etat)
+    #println("S : ", succ)
+    #println("P : ", parc)
 
     #return parc
     return succ
 end
-#=
+
 function calculCout(C::Array{Int64,2},P::Array{Int64,1})
     T = 0
     nbPoint = size(P,1)
     i = 1
     x = 1
     while i <= nbPoint
-        println("i = " , x, " | i+1 = ", P[x])
-        println("   Cout arc (",x,",",P[x],") = ", C[x,P[x]])
+        #println("i = " , x, " | i+1 = ", P[x])
+        #println("   Cout arc (",x,",",P[x],") = ", C[x,P[x]])
         T = T + C[x,P[x]]
-        println("   CumSum ", T)
+        #println("   CumSum ", T)
         i = i + 1
         x = P[x]
     end
     return T
 end
-=#
 
 
-
-###############################################################
-###############################################################
-###############################################################
-## Pour tout sommet xi de H faire
-
-
-### Etape 1 : on va déjà lui demander qu'à partir d'un sommet, il affiche le sommet des autres
-### On est sur des cycles - On sait que ça termine.
-### On connait le nombre d'arc dans ce graphe (c'est nbSommet - 1)
-#dep = 1
-#x = P[dep]
-
-function opt2(X::Array{Int64,1})
-    nbSommet = size(X,1)
+function opt2(P::Array{Int64,1})
+    nbSommet = size(P,1)
     ## Le point de départ
     x = 1
     amelio = false
     println("Parcours de base :")
     println(P)
     println("##################")
-    cpt = 1
-    while (amelio == false && cpt <= nbSommet)
+    #cpt = 1
+    #while (amelio == false && cpt <= nbSommet)
+    while (amelio == false)
         #amelio = false
         for i in 1:nbSommet
             #println("x = ", x , "| P[x] = ", P[x])
-            #println("Arc Base : (", x,",",P[x],")")
+            println("Arc Base : (", x,",",P[x],")")
                 #y =P[x]
                 y = P[P[x]]
                 for j in 1:nbSommet-3
@@ -489,31 +498,18 @@ function opt2(X::Array{Int64,1})
             end
             println(P)
             #calculCout(C,P)
-            cpt = 1 + cpt
+            #cpt = 1 + cpt
     end
-    return X
+    return P
 end
 
-
-
-
-
-## GROS SOUCI DE MON IMPLEMENTATION - C'EST QUE JE DÉGRADE LA MATRICE SUR LAQUELLE J'EFFECTUE MA RECHERCHE DE VOISIN
-C = parseTSP("plat/plat10.dat"))
-## Création d'une copie de la matrice pour pouvoir travailler dessus
-X = parseTSP("plat/plat10.dat"))
-
+C = parseTSP("plat/plat20.dat")
+X = parseTSP("plat/plat20.dat")
 
 P = procheVoisin(X,1)
-T = calculCout(C,P)
+Tp = calculCout(C,P)
 O = opt2(P)
 F = calculCout(C,O)
-## Variation constaté
-Var = T - F
-println("Delta coût : ", Var )
-
-
-
 
 
 
