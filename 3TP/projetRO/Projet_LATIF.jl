@@ -360,43 +360,12 @@ end
 #######################################################################
 
 #C = parseTSP("plat/exemple.dat")
-#C = parseTSP("plat/plat10.dat")
-#C = parseTSP("plat/plat20.dat")
-#C = parseTSP("plat/plat30.dat")
-#C = parseTSP("plat/plat40.dat")
-#C = parseTSP("plat/plat50.dat")
-#C = parseTSP("plat/plat60.dat")
-#C = parseTSP("plat/plat70.dat")
-#C = parseTSP("plat/plat80.dat")
-#C = parseTSP("plat/plat90.dat")
-#C = parseTSP("plat/plat100.dat")
-#C = parseTSP("plat/plat110.dat")
-#C = parseTSP("plat/plat120.dat")
-#C = parseTSP("plat/plat130.dat")
-#C = parseTSP("plat/plat140.dat")
-#C = parseTSP("plat/plat150.dat")
-
-
-
 
 #C = parseTSP("relief/relief10.dat")
-#C = parseTSP("relief/relief20.dat")
-#C = parseTSP("relief/relief30.dat")
-#C = parseTSP("relief/relief40.dat")
-#C = parseTSP("relief/relief50.dat")
-#C = parseTSP("relief/relief60.dat")
-#C = parseTSP("relief/relief70.dat")
-#C = parseTSP("relief/relief80.dat")
-#C = parseTSP("relief/relief90.dat")
-#C = parseTSP("relief/relief100.dat")
-#C = parseTSP("relief/relief110.dat")
-#C = parseTSP("relief/relief120.dat")
-#C = parseTSP("relief/relief130.dat")
-#C = parseTSP("relief/relief140.dat")
-#C = parseTSP("relief/relief150.dat")
 
-# Nom = "plat/plat10.dat"
- Nom = "plat/plat20.dat"
+
+#Nom = "plat/plat10.dat"
+# Nom = "plat/plat20.dat"
 # Nom = "plat/plat30.dat"
 # Nom = "plat/plat40.dat"
 # Nom = "plat/plat50.dat"
@@ -411,12 +380,31 @@ end
 # Nom = "plat/plat140.dat"
 # Nom = "plat/plat150.dat"
 
+
+#Nom = "relief/relief10.dat"
+# Nom = "relief/relief20.dat"
+# Nom = "relief/relief30.dat"
+# Nom = "relief/relief40.dat"
+# Nom = "relief/relief50.dat"
+# Nom = "relief/relief60.dat"
+# Nom = "relief/relief70.dat"
+# Nom = "relief/relief80.dat"
+# Nom = "relief/relief90.dat"
+# Nom = "relief/relief100.dat"
+# Nom = "relief/relief110.dat"
+# Nom = "relief/relief120.dat"
+# Nom = "relief/relief130.dat"
+# Nom = "relief/relief140.dat"
+# Nom = "relief/relief150.dat"
+
+
+#=
 C = parseTSP(Nom)
-outfile = Nom*" - res.txt"
+outfile = Nom*"EXA - res.txt"
 # writing to files is very similar:
 f = open(outfile, "w")
 # both print and println can be used as usual but with f as their first arugment
-
+=#
 
 ################################################################################
 ################################################################################
@@ -425,7 +413,7 @@ f = open(outfile, "w")
 ################################################################################
 ################################################################################
 ################################################################################
-
+#=
 @time begin
     println(f,"Résolution exacte pour ", Nom ," points à visiter :")
     #println("Résolution exacte pour ", Nom ," points à visiter :")
@@ -519,6 +507,7 @@ f = open(outfile, "w")
 end
 
 close(f)
+=#
 
 
 ################################################################################
@@ -529,6 +518,31 @@ close(f)
 ################################################################################
 ################################################################################
 ## ATTENTION DANS CE CAS LÀ, LE DISTANCIER DOIT ÊTRE SYMÉTRIQUE
+
+
+# Nom = "plat/plat10.dat"
+# Nom = "plat/plat20.dat"
+# Nom = "plat/plat30.dat"
+# Nom = "plat/plat40.dat"
+# Nom = "plat/plat50.dat"
+# Nom = "plat/plat60.dat"
+# Nom = "plat/plat70.dat"
+# Nom = "plat/plat80.dat"
+# Nom = "plat/plat90.dat"
+# Nom = "plat/plat100.dat"
+# Nom = "plat/plat110.dat"
+# Nom = "plat/plat120.dat"
+# Nom = "plat/plat130.dat"
+# Nom = "plat/plat140.dat"
+# Nom = "plat/plat150.dat"
+
+
+C = parseTSP(Nom)
+outfile = Nom*"EXA - res.txt"
+# writing to files is very similar:
+f = open(outfile, "w")
+# both print and println can be used as usual but with f as their first arugment
+
 
 #=
     C = parseTSP("plat/exemple.dat")
