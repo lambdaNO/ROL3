@@ -110,7 +110,7 @@ function calculCout(X::Array{Int64,2},V::Array{Int64,1})
     T = 0
     nbPoint = size(V,1)
     i = 1
-    while i < nbPoint
+    while i <= nbPoint
         println("i = " , V[i], "| i+1 = ", V[i + 1])
         println("Cout arc (",V[i],",",V[i+1],") = ", X[V[i],V[i+1]])
         T = T + X[V[i],V[i+1]]
