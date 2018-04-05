@@ -368,49 +368,6 @@ X = [
 ]
 =#
 
-
-function procheVoisin(X::Array{Int64,2},dep::Int64)
-    #dep = 1
-    nbPoint = size(X,1)
-    ## Matrice des points visités
-    etat = zeros(Int64,nbPoint)
-    ## Matrice des successeurs
-    succ = zeros(Int64,nbPoint)
-    ### Sauvegarder le point de départ.
-    x = dep
-    ### Initialisation d'un vecteur parc permettant de vérifier le parcours obtenu
-    parc = [x]
-    ### Initialisation de la variable de boucle - comparaison du min
-    m = 0
-
-
-    while (m!= 10000)
-        println("Recherche du succ de ", x)
-        println(X[x,:])
-        println("Min de la ligne ",x," = ", minimum(X[x,:]), " atteint au point ", indmin(X[x,:]))
-        t = indmin(X[x,:])
-        X[:,x] = 10000
-        succ[x] = t
-        etat[x] = 1
-        push!(parc,t)
-        #println("E : ", etat)
-        #println("S : ", succ)
-        #println("P : ", parc)
-        x = t
-        m = minimum(X[x,:])
-    end
-    #println("Dernier point visité ", x)
-    etat[x] = 1
-    succ[x] = dep
-    push!(parc,dep)
-    #println("E : ", etat)
-    #println("S : ", succ)
-    #println("P : ", parc)
-
-    #return parc
-    return succ
-end
-
 function calculCout(C::Array{Int64,2},P::Array{Int64,1})
     T = 0
     nbPoint = size(P,1)
@@ -427,89 +384,136 @@ function calculCout(C::Array{Int64,2},P::Array{Int64,1})
     return T
 end
 
+function procheVoisin(X::Array{Int64,2},dep::Int64)
+    #dep = 1
+    nbPoint = size(X,1)
+    ## Matrice des points visités
+    etat = zeros(Int64,nbPoint)
+    ## Matrice des successeurs
+    succ = zeros(Int64,nbPoint)
+    ### Sauvegarder le point de départ.
+    x = dep
+    ### Initialisation d'un vecteur parc permettant de vérifier le parcours obtenu
+    parc = [x]
+    ### Initialisation de la variable de boucle - comparaison du min
+    m = 0
+    ## Ajout d'éléments infini (10000) sur la diagonale pour le calcul des plus proches voisins - Permet d'éviter qu'un
+    ## élément ne soit lui même son plus proche voisin.
+    for i in 1:size(C,1) X[i,i] = 10000 end
 
-function opt2(P::Array{Int64,1})
+    while (m!= 10000)
+        #println("Recherche du succ de ", x)#println(X[x,:])#println("Min de la ligne ",x," = ", minimum(X[x,:]), " atteint au point ", indmin(X[x,:]))
+        t = indmin(X[x,:])
+        X[:,x] = 10000
+        succ[x] = t
+        etat[x] = 1
+        push!(parc,t)
+        #println("E : ", etat) #println("S : ", succ) #println("P : ", parc)
+        x = t
+        m = minimum(X[x,:])
+    end
+    #println("Dernier point visité ", x)
+    etat[x] = 1
+    succ[x] = dep
+    push!(parc,dep)
+    #println("E : ", etat)#println("S : ", succ)
+    println("P : ", parc)
+    #return parc
+    return succ
+end
+
+
+function opt2(P::Array{Int64,1},dep::Int64)
+    ## P, le parcours
     nbSommet = size(P,1)
     ## Le point de départ
-    x = 1
+    x = dep
     amelio = false
+    println("##################")
     println("Parcours de base :")
     println(P)
+    println("Coût de base :")
+    println(calculCout(C,P))
     println("##################")
-    #cpt = 1
-    #while (amelio == false && cpt <= nbSommet)
     while (amelio == false)
-        #amelio = false
-        for i in 1:nbSommet
+        while(P[x]!=1 && amelio != true)
             #println("x = ", x , "| P[x] = ", P[x])
-            println("Arc Base : (", x,",",P[x],")")
-                #y =P[x]
+            #println("Arc Base : (", x,",",P[x],")")
                 y = P[P[x]]
                 for j in 1:nbSommet-3
-                    #println("   y = ", y,"| P[y] = ", P[y])
-                    #println("   Arc Pivot : (", y,",",P[y],")")
+                    #println("   y = ", y,"| P[y] = ", P[y]) #println("   Arc Pivot : (", y,",",P[y],")")
+                    ###########################################
                     ###########################################
                     ### Etude Delta :
                     delta = 0
-                    # arête (i,j) = (x,P[x])
-                    # arête (i',j') = (y,P[y])- non consécutive à (i,j)
-                    #println("       Arêtes étudiées (i = ",x,",j = ",P[x],") et (i' = ",y,", j' = ",P[y],").")
-                    ## Cii' : C1
-                    #println("          Cii' => Coût (",x,",",y,") = ", C[x,y])
+                    # arête (i,j) = (x,P[x]) - # arête (i',j') = (y,P[y])- non consécutive à (i,j)
+                    #println("       Arêtes étudiées (i = ",x,",j = ",P[x],") et (i' = ",y,", j' = ",P[y],").") - ## Cii' : C1 -#println("          Cii' => Coût (",x,",",y,") = ", C[x,y])
                     C1 = C[x,y]
-                    ## Cjj' : C2
-                    #println("          Cjj' => Coût (",P[x],",",P[y],") = ", C[P[x],P[y]])
+                    ## Cjj' : C2 - #println("          Cjj' => Coût (",P[x],",",P[y],") = ", C[P[x],P[y]])
                     C2 = C[P[x],P[y]]
-                    ## Cij : C3
-                    #println("          Cij => Coût (",x,",",P[x],") = ", C[x,P[x]])
+                    ## Cij : C3 - #println("          Cij => Coût (",x,",",P[x],") = ", C[x,P[x]])
                     C3 = C[x,P[x]]
-                    ## Ci'j' : C4
-                    #println("          Ci'j' => Coût (",y,",",P[y],") = ", C[y,P[y]])
+                    ## Ci'j' : C4 - #println("          Ci'j' => Coût (",y,",",P[y],") = ", C[y,P[y]])
                     C4 = C[y,P[y]]
                     ## Delta = A + B - C - D
                     delta = C1 + C2 - C3 - C4
-                    println("           Δ((",x,",",P[x],");(",y,",",P[y],") = ", delta)
+                    #println("           Δ((",x,",",P[x],");(",y,",",P[y],") = ", delta)
                     if (delta < 0 )
-                        println("Solution améliorante : : ")
-                        println(P)
-                        println("           Δ((i = ",x,", j = ",P[x],");(i' = ",y,", j' = ",P[y],") = ", delta)
-                        ## Modication à effectuer :
-                        ### (i=x,j=P[x]) devient (i=x,i'=y) (1)
-                        ### (i'=y,j'=P[y]) devient (j=P[x],j'=P[y])
-                        ### CF Image Tableau
-                        #println("i - x = ", x)
-                        #println("j - P[x]= ",P[x])
-                        #println("i' - y = ", y)
-                        #println("j' - P[y]= ",P[y])
-
-                        ########
-                        #tmpx = P[x]
-                        tmpy = P[y]
-                        P[y]=P[x]
-                        P[x] = y
-                        P[P[y]] = tmpy
-                        println(P)
-                        amelio = true
+                        println("#########################################################################################")
+                        println("Δ < 0 trouvé : ")
+                        # Création d'une copie profonde du trajet initial pour amélioration potentielle
+                        T = copy(P)
+                        println("           Δ((i = ",x,", j = ",T[x],");(i' = ",y,", j' = ",T[y],") = ", delta)
+                        ## Modication à effectuer : (i=x,j=P[x]) devient (i=x,i'=y) (1) | (i'=y,j'=P[y]) devient (j=P[x],j'=P[y])
+                        #println("i - x = ", x);println("j - P[x]= ",P[x]);println("i' - y = ", y);println("j' - P[y]= ",P[y])
+                        ## Modification dans T (la copie)
+                        tmpy = T[y]
+                        T[y]=T[x]
+                        T[x] = y
+                        T[T[y]] = tmpy
+                        println("           Parcours initial : ", P)
+                        println("           Parcours modifié : ", T)
+                        println("           Coût init ", calculCout(C,P), " - Coût modif ", calculCout(C,T))
+                        println("           Variation de coût : ", calculCout(C,T) - calculCout(C,P))
+                        ## Si la solution obtenue après amélioration (T) possède un cout inférieur à la solution de départ (P).
+                        ## Alors T devient le nouveau parcours
+                        ## Sinon, on continu à chercher
+                        if (calculCout(C,P) > calculCout(C,T))
+                            println("           > Coût inférieur obtenu avec ce nouveau parcours -> Solution améliorante.")
+                            P = copy(T)
+                            amelio = true
+                        else
+                            println("           > Coût supérieur obtenu avec ce nouveau parcours -> Solution non améliorante.")
+                        end
+                        println("           Parcours retourné : ", P)
+                        println("#########################################################################################")
                     end
                 ###########################################
                     y = P[y]
                 end
                 x = P[x]
             end
-            println(P)
-            #calculCout(C,P)
-            #cpt = 1 + cpt
     end
     return P
 end
 
-C = parseTSP("plat/plat20.dat")
-X = parseTSP("plat/plat20.dat")
 
-P = procheVoisin(X,1)
-Tp = calculCout(C,P)
-O = opt2(P)
-F = calculCout(C,O)
+
+
+C = parseTSP("plat/exemple.dat")
+## Création d'une copie de la matrice que l'on va dégrader pour la recherche des plus proches voisins
+X = copy(C)
+## Point de départ de la recherche
+dep = 1
+P = procheVoisin(X,dep)
+CoutAV = calculCout(C,P)
+O = opt2(P,dep)
+CoutAP = calculCout(C,O)
+## Variation constaté
+println("Cout AV = ", CoutAV)
+println("Cout AP = ", CoutAP)
+Var =  CoutAP - CoutAV
+println("Delta coût : ", Var )
 
 
 

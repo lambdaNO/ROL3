@@ -28,14 +28,16 @@ X = [0 59 76 56 49 39 44 31 1 27 90 23 67 92 10 10 7 86 79 97; 59 0 92 70 82 41 
 
 
 
+
+
 function calculCout(C::Array{Int64,2},P::Array{Int64,1})
     T = 0
     nbPoint = size(P,1)
     i = 1
     x = 1
     while i <= nbPoint
-        #println("i = " , x, " | i+1 = ", P[x])
-        #println("   Cout arc (",x,",",P[x],") = ", C[x,P[x]])
+        println("i = " , x, " | i+1 = ", P[x])
+        println("   Cout arc (",x,",",P[x],") = ", C[x,P[x]])
         T = T + C[x,P[x]]
         #println("   CumSum ", T)
         i = i + 1
@@ -57,7 +59,9 @@ function procheVoisin(X::Array{Int64,2},dep::Int64)
     parc = [x]
     ### Initialisation de la variable de boucle - comparaison du min
     m = 0
-
+    ## Ajout d'éléments infini (10000) sur la diagonale pour le calcul des plus proches voisins - Permet d'éviter qu'un
+    ## élément ne soit lui même son plus proche voisin.
+    for i in 1:size(C,1) X[i,i] = 10000 end
 
     while (m!= 10000)
         #println("Recherche du succ de ", x)
@@ -78,30 +82,18 @@ function procheVoisin(X::Array{Int64,2},dep::Int64)
     etat[x] = 1
     succ[x] = dep
     push!(parc,dep)
-    println("E : ", etat)
-    println("S : ", succ)
+    #println("E : ", etat)
+    #println("S : ", succ)
     println("P : ", parc)
     #return parc
     return succ
 end
 
-
-
-
-
 ###############################################################
 ###############################################################
 ###############################################################
-## Pour tout sommet xi de H faire
-
-
-### Etape 1 : on va déjà lui demander qu'à partir d'un sommet, il affiche le sommet des autres
-### On est sur des cycles - On sait que ça termine.
-### On connait le nombre d'arc dans ce graphe (c'est nbSommet - 1)
-#dep = 1
-#x = P[dep]
-
 function opt2(P::Array{Int64,1})
+    ## P, le parcours
     nbSommet = size(P,1)
     ## Le point de départ
     x = 1
@@ -110,72 +102,68 @@ function opt2(P::Array{Int64,1})
     println("Parcours de base :")
     println(P)
     println("##################")
-    cpt = 1
+    #cpt = 1
     while (amelio == false)
     #while (amelio == false && cpt <= nbSommet)
         #amelio = false
-
         #for i in 1:nbSommet
         while(P[x]!=1 && amelio != true)
             println("x = ", x , "| P[x] = ", P[x])
             #println("x = ", x , "| P[x] = ", P[x])
             #println("Arc Base : (", x,",",P[x],")")
-                #y =P[x]
                 y = P[P[x]]
                 for j in 1:nbSommet-3
-                    #println("   y = ", y,"| P[y] = ", P[y])
-                    #println("   Arc Pivot : (", y,",",P[y],")")
+                    #println("   y = ", y,"| P[y] = ", P[y]) - #println("   Arc Pivot : (", y,",",P[y],")")
                     ###########################################
                     ### Etude Delta :
                     delta = 0
-                    # arête (i,j) = (x,P[x])
-                    # arête (i',j') = (y,P[y])- non consécutive à (i,j)
-                    #println("       Arêtes étudiées (i = ",x,",j = ",P[x],") et (i' = ",y,", j' = ",P[y],").")
-                    ## Cii' : C1
-                    #println("          Cii' => Coût (",x,",",y,") = ", C[x,y])
+                    # arête (i,j) = (x,P[x]) - # arête (i',j') = (y,P[y])- non consécutive à (i,j)
+                    #println("       Arêtes étudiées (i = ",x,",j = ",P[x],") et (i' = ",y,", j' = ",P[y],").") - ## Cii' : C1 -#println("          Cii' => Coût (",x,",",y,") = ", C[x,y])
                     C1 = C[x,y]
-                    ## Cjj' : C2
-                    #println("          Cjj' => Coût (",P[x],",",P[y],") = ", C[P[x],P[y]])
+                    ## Cjj' : C2 - #println("          Cjj' => Coût (",P[x],",",P[y],") = ", C[P[x],P[y]])
                     C2 = C[P[x],P[y]]
-                    ## Cij : C3
-                    #println("          Cij => Coût (",x,",",P[x],") = ", C[x,P[x]])
+                    ## Cij : C3 - #println("          Cij => Coût (",x,",",P[x],") = ", C[x,P[x]])
                     C3 = C[x,P[x]]
-                    ## Ci'j' : C4
-                    #println("          Ci'j' => Coût (",y,",",P[y],") = ", C[y,P[y]])
+                    ## Ci'j' : C4 - #println("          Ci'j' => Coût (",y,",",P[y],") = ", C[y,P[y]])
                     C4 = C[y,P[y]]
                     ## Delta = A + B - C - D
                     delta = C1 + C2 - C3 - C4
-                    println("           Δ((",x,",",P[x],");(",y,",",P[y],") = ", delta)
+                    #println("           Δ((",x,",",P[x],");(",y,",",P[y],") = ", delta)
                     if (delta < 0 )
+                        println("#########################################################################################")
                         println("Δ < 0 trouvé : ")
-                        println("       ",P)
-                        ## IDEE : Sauvegarder par copie profonde le trajet initiale
-                        R = copy(P)
-                        println("           Δ((i = ",x,", j = ",P[x],");(i' = ",y,", j' = ",P[y],") = ", delta)
+                        #println("       ",P)
+
+                        #########################################################################################
+                        #########################################################################################
+                        #########################################################################################
+                        # Création d'une copie profonde du trajet initial pour amélioration potentielle
+                        T = copy(P)
+                        println("           Δ((i = ",x,", j = ",T[x],");(i' = ",y,", j' = ",T[y],") = ", delta)
                         ## Modication à effectuer : (i=x,j=P[x]) devient (i=x,i'=y) (1) | (i'=y,j'=P[y]) devient (j=P[x],j'=P[y])
                         #println("i - x = ", x);println("j - P[x]= ",P[x]);println("i' - y = ", y);println("j' - P[y]= ",P[y])
-
-                        ########
-                        tmpy = P[y]
-                        P[y]=P[x]
-                        P[x] = y
-                        P[P[y]] = tmpy
-                        #println(P)
-                        println("Avant : ", R)
-                        println("Après : ", P)
-                        println("Cout AVANT ", calculCout(C,R))
-                        println("Cout APRES ", calculCout(C,P))
-
-                        if (calculCout(C,R) > calculCout(C,P))
+                        ## Modification dans T (la copie)
+                        tmpy = T[y]
+                        T[y]=T[x]
+                        T[x] = y
+                        T[T[y]] = tmpy
+                        println("Parcours initial : ", P)
+                        println("Parcours modifié : ", T)
+                        println("Cout AVANT ", calculCout(C,P))
+                        println("Cout APRES ", calculCout(C,T))
+                        println("Variation de coût : ",   calculCout(C,T) - calculCout(C,P))
+                        ## Si la solution obtenue après amélioration (T) possède un cout inférieur à la solution de départ (P).
+                        ## Alors T devient le nouveau parcours
+                        ## Sinon, on continu à chercher
+                        if (calculCout(C,P) > calculCout(C,T))
                             println(" > Coût inférieur obtenu avec cette nouvelle solution -> Solution améliorante.")
+                            P = copy(T)
                             amelio = true
                         else
                             println(" > Coût supérieur obtenu avec cette nouvelle solution -> Solution non améliorante.")
-                            ## On continu la recherche d'une solution améliorante avec l'ancien parcours
-                            #P = copy(R) # L'utilisation de la copie profonde ne change rien ici
-                            #P = R
                         end
-                        println("APRESSI ", P)
+                        println("Parcours retourné : ", P)
+                        println("#########################################################################################")
                     end
                 ###########################################
                     y = P[y]
@@ -187,16 +175,14 @@ function opt2(P::Array{Int64,1})
 end
 
 
-#C = parseTSP("relief/relief150.dat")
-#X = parseTSP("relief/relief150.dat")
 
 P = procheVoisin(X,1)
 CoutAV = calculCout(C,P)
-O = opt2(P)
-CoutAP = calculCout(C,O)
+#O = opt2(P)
+#CoutAP = calculCout(C,O)
 ## Variation constaté
 println("Cout AV = ", CoutAV)
-println("Cout AP = ", CoutAP)
+#println("Cout AP = ", CoutAP)
 
-Var =  CoutAP - CoutAV
-println("Delta coût : ", Var )
+#Var =  CoutAP - CoutAV
+#println("Delta coût : ", Var )
