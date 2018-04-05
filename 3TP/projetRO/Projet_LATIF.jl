@@ -238,7 +238,8 @@ function calculCout(C::Array{Int64,2},P::Array{Int64,1})
 end
 
 function procheVoisin(X::Array{Int64,2},dep::Int64)
-    println("Proches voisins ")
+    #println("Proches voisins ")
+    println(f,"Proches voisins ")
     #dep = 1
     nbPoint = size(X,1)
     ## Matrice des points visités
@@ -271,7 +272,8 @@ function procheVoisin(X::Array{Int64,2},dep::Int64)
     succ[x] = dep
     push!(parc,dep)
     #println("E : ", etat)#println("S : ", succ)
-    println("P : ", parc)
+    #println("P : ", parc)
+    println(f,"P : ", parc)
     #return parc
     return succ
 end
@@ -283,11 +285,18 @@ function opt2(P::Array{Int64,1},dep::Int64)
     x = dep
     amelio = false
     cpt = 0
-    println("Parcours de base :")
-    println(P)
-    println("Coût de base :")
-    println(calculCout(C,P))
-    println("##################")
+    # println("Parcours de base :")
+    # println(P)
+    # println("Coût de base :")
+    # println(calculCout(C,P))
+    # println("##################")
+
+    println(f,"Parcours de base :")
+    println(f,P)
+    println(f,"Coût de base :")
+    println(f,calculCout(C,P))
+    println(f,"##################")
+
     while (amelio == false)
         while(P[x]!=1 && amelio != true)
             #println("x = ", x , "| P[x] = ", P[x])
@@ -313,11 +322,14 @@ function opt2(P::Array{Int64,1},dep::Int64)
                     #println("           Δ((",x,",",P[x],");(",y,",",P[y],") = ", delta)
                     if (delta < 0 )
                         cpt = cpt + 1
-                        println("#########################################################################################")
-                        println("Δ < 0 trouvé : ")
+                        # println("#########################################################################################")
+                        # println("Δ < 0 trouvé : ")
+                        println(f,"#########################################################################################")
+                        println(f,"Δ < 0 trouvé : ")
                         # Création d'une copie profonde du trajet initial pour amélioration potentielle
                         T = copy(P)
-                        println("           Δ((i = ",x,", j = ",T[x],");(i' = ",y,", j' = ",T[y],") = ", delta)
+                        #println("           Δ((i = ",x,", j = ",T[x],");(i' = ",y,", j' = ",T[y],") = ", delta)
+                        println(f,"           Δ((i = ",x,", j = ",T[x],");(i' = ",y,", j' = ",T[y],") = ", delta)
                         ## Modication à effectuer : (i=x,j=P[x]) devient (i=x,i'=y) (1) | (i'=y,j'=P[y]) devient (j=P[x],j'=P[y])
                         #println("i - x = ", x);println("j - P[x]= ",P[x]);println("i' - y = ", y);println("j' - P[y]= ",P[y])
                         ## Modification dans T (la copie)
@@ -325,22 +337,34 @@ function opt2(P::Array{Int64,1},dep::Int64)
                         T[y]=T[x]
                         T[x] = y
                         T[T[y]] = tmpy
-                        println("           Parcours initial : ", P)
-                        println("           Parcours modifié : ", T)
-                        println("           Coût init ", calculCout(C,P), " - Coût modif ", calculCout(C,T))
-                        println("           Variation de coût : ", calculCout(C,T) - calculCout(C,P))
+                        # println("           Parcours initial : ", P)
+                        # println("           Parcours modifié : ", T)
+                        # println("           Coût init ", calculCout(C,P), " - Coût modif ", calculCout(C,T))
+                        # println("           Variation de coût : ", calculCout(C,T) - calculCout(C,P))
+
+                        println(f,"           Parcours initial : ", P)
+                        println(f,"           Parcours modifié : ", T)
+                        println(f,"           Coût init ", calculCout(C,P), " - Coût modif ", calculCout(C,T))
+                        println(f,"           Variation de coût : ", calculCout(C,T) - calculCout(C,P))
+
+
                         ## Si la solution obtenue après amélioration (T) possède un cout inférieur à la solution de départ (P).
                         ## Alors T devient le nouveau parcours
                         ## Sinon, on continu à chercher
                         if (calculCout(C,P) > calculCout(C,T))
-                            println("           > Coût inférieur obtenu avec ce nouveau parcours -> Solution améliorante.")
+                            #println("           > Coût inférieur obtenu avec ce nouveau parcours -> Solution améliorante.")
+                            println(f,"           > Coût inférieur obtenu avec ce nouveau parcours -> Solution améliorante.")
+
                             P = copy(T)
                             amelio = true
                         else
-                            println("           > Coût supérieur obtenu avec ce nouveau parcours -> Solution non améliorante.")
+                            #println("           > Coût supérieur obtenu avec ce nouveau parcours -> Solution non améliorante.")
+                            println(f,"           > Coût supérieur obtenu avec ce nouveau parcours -> Solution non améliorante.")
                         end
-                        println("           Parcours retourné : ", P)
-                        println("#########################################################################################")
+                        #println("           Parcours retourné : ", P)
+                        #println("#########################################################################################")
+                        println(f,"           Parcours retourné : ", P)
+                        println(f,"#########################################################################################")
                     end
                 ###########################################
                     y = P[y]
@@ -348,7 +372,8 @@ function opt2(P::Array{Int64,1},dep::Int64)
                 x = P[x]
             end
     end
-    println("Nombre de solutions potentiellement améliorantes détectées : ", cpt)
+    println(f,"Nombre de solutions potentiellement améliorantes détectées : ", cpt)
+    #println("Nombre de solutions potentiellement améliorantes détectées : ", cpt)
     return P
 end
 
@@ -519,7 +544,7 @@ close(f)
 ################################################################################
 ## ATTENTION DANS CE CAS LÀ, LE DISTANCIER DOIT ÊTRE SYMÉTRIQUE
 
-
+Nom = "plat/exemple.dat"
 # Nom = "plat/plat10.dat"
 # Nom = "plat/plat20.dat"
 # Nom = "plat/plat30.dat"
@@ -538,14 +563,13 @@ close(f)
 
 
 C = parseTSP(Nom)
-outfile = Nom*"EXA - res.txt"
+outfile = Nom*"APP - res.txt"
 # writing to files is very similar:
 f = open(outfile, "w")
 # both print and println can be used as usual but with f as their first arugment
 
 
-#=
-    C = parseTSP("plat/exemple.dat")
+
     ## Création d'une copie de la matrice que l'on va dégrader pour la recherche des plus proches voisins
     X = copy(C)
     ## Point de départ de la recherche
@@ -556,10 +580,14 @@ f = open(outfile, "w")
     O = opt2(P,dep)
     end
     CoutAP = calculCout(C,O)
-    ## Variation constaté
-    println("Cout AV = ", CoutAV)
-    println("Cout AP = ", CoutAP)
+    ## Variation constatée
+    #println("Cout AV = ", CoutAV)
+    #println("Cout AP = ", CoutAP)
+    println(f,"Cout AV = ", CoutAV)
+    println(f,"Cout AP = ", CoutAP)
     Var =  CoutAP - CoutAV
-    println("Delta coût : ", Var )
+    #println("Delta coût : ", Var )
+    println(f,"Delta coût : ", Var )
+    println(f,"Parcours final : ",O)
 
-=#
+close(f)
