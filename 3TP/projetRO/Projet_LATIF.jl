@@ -2,19 +2,12 @@
 #= LATIF - Mehdi
    681 - Maths info
    Life on Mars - Licence 3 - 2017/2018
-   N'oubliez pas de modifier ce commentaire, ainsi que le nom du fichier! =#
+   ##############################################
+   ## PATH MAC
+   ## cd Desktop/ÉTUDES/FAC/S6/RO/TP/3TP/projetRO
+ =#
 
 using JuMP, GLPKMathProgInterface
-
-
-#= Nombreuses autres fonctions à ajouter
-   .
-   .
-   .
-   .
-   .
-=#
-
 
 # Fonction de résolution exacte du problème de voyageur de commerce, dont le distancier est passé en paramètre
 
@@ -47,21 +40,21 @@ function TSP(C::Array{Int64,2})
         On arrive à la ville j une seule et unique fois
     =#
     @constraint(m,ctrArrivee[j=1:nbPoint],sum(x[i,j] for i in 1:nbPoint if i!=j)==1)
-    #=
-        Contrainte 3 - ajout des i!=j
-
+#=
+    Contrainte 3 - ajout des i!=j
     @constraint(m,ctr2i[i=1:nbPoint],x[i,i]==0)
 
-        Contrainte 4 - Probablement redondante avec la contrainte 3
-
+    Contrainte 4 - Probablement redondante avec la contrainte 3
     @constraint(m,ctr2j[j=1:nbPoint],x[j,j]==0)
-    =#
+    Contraintes devenues redondantes après l'ajout de l'expression "if != j" dans la contrainte 2
+=#
     return m
 end
 
 function imp(m::Model)
     if status == :Optimal
-        println("> temps total = ",getobjectivevalue(m))
+        #println("> temps total = ",getobjectivevalue(m))
+        println(f,"> temps total = ",getobjectivevalue(m))
         #println("Ordre de visite des points :", permutation(getvalue(m[:x])))
     elseif status == :Unbounded
         println("Problème non-borné")
@@ -73,7 +66,7 @@ end
 
 #= Fonction qui résout l'ensemble des instances du projet avec la méthode de résolution exacte,
    le temps d'exécution de chacune des instances est mesuré =#
-
+#=
 function scriptTSP()
     # Première exécution sur l'exemple pour forcer la compilation si elle n'a pas encore été exécutée
     C = parseTSP("plat/exemple.dat")
@@ -97,7 +90,7 @@ function scriptTSP()
     end
 
 end
-
+=#
 # fonction qui prend en paramètre un fichier contenant un distancier et qui retourne le tableau bidimensionnel correspondant
 
 function parseTSP(nomFichier::String)
@@ -132,11 +125,13 @@ end
 function permutation(X::Array{Float64,2})
     nbPoint = size(X,1)
     V=[0 for i in 1:nbPoint]
-        println("   Permutations :")
+        #println("   Permutations :")
+        println(f,"   Permutations :")
         for i in 1:nbPoint
             for j in 1:nbPoint
                 if (X[i,j]==1)
-                    print("(",i," -> ",j,") ")
+                    #print("(",i," -> ",j,") ")
+                    print(f,"(",i," -> ",j,") ")
                     V[i]=j
                 end
             end
@@ -217,156 +212,14 @@ end
 
 function imp_cycle(C::Array{Int64,1})
     for i = 1:length(C)
-        print(C[i]," -> ")
+        #print(C[i]," -> ")
+        print(f,C[i]," -> ")
     end
-    print(C[1],". ")
-    println()
+    #print(C[1],". ")
+    print(f,C[1],". ")
+    #println()
+    println(f,"")
 end
-
-
-#######################################################################
-#######################################################################
-#######################################################################
-#######################################################################
-#######################################################################
-#######################################################################
-
-#C = parseTSP("plat/exemple.dat")
-#C = parseTSP("plat/plat10.dat")
-#C = parseTSP("plat/plat20.dat")
-#C = parseTSP("plat/plat30.dat")
-#C = parseTSP("plat/plat40.dat")
-#C = parseTSP("plat/plat50.dat")
-#C = parseTSP("plat/plat60.dat")
-#C = parseTSP("plat/plat70.dat")
-#C = parseTSP("plat/plat80.dat")
-#C = parseTSP("plat/plat90.dat")
-#C = parseTSP("plat/plat100.dat")
-#C = parseTSP("plat/plat110.dat")
-#C = parseTSP("plat/plat120.dat")
-#C = parseTSP("plat/plat130.dat")
-#C = parseTSP("plat/plat140.dat")
-#C = parseTSP("plat/plat150.dat")
-
-#C = parseTSP("relief/relief10.dat")
-
-#C = parseTSP("relief/relief150.dat")
-
-################################################################################
-################################################################################
-################################################################################
-##########################    EXACTE  ##########################################
-################################################################################
-################################################################################
-################################################################################
-#=
-@time begin
-    #C =  parseTSP(S)
-    nbiter = 1
-    nbcycle = 0
-    println("Résolution d'initiale :  ")
-    m = TSP(C)
-    status = solve(m)
-    nbiter = 1
-    imp(m)
-    P = permutation(getvalue(m[:x]))
-    nbPoint = size(P,1)
-    etat = zeros(Int64,nbPoint)
-    pere = zeros(Int64,nbPoint)
-    cycle = explorer(P,etat,pere)
-    println("> Cycle(s) trouvé(s) : ", cycle)
-    nbcycle = length(cycle)
-    println("> Nombre de cycle(s) trouvé(s) : ",nbcycle)
-    println()
-#######################################################################
-#######################################################################
-    while(nbcycle!= 1)
-        println("Itération n° ", nbiter," Cassage de contrainte ")
-        ind = ind_min(cycle)
-        aCasser = cycle[ind]
-        ## ex : aCasser = [5, 8, 14, 13, 15]
-        println("> Cycle à casser : ", aCasser)
-        ## Récupérer la taille du cycle
-        tailleACasser = length(aCasser)
-        println("> Taille du cycle à casser : ", tailleACasser)
-        ## Ajouter le premier élément du cycle à casser pour que aCasser forme un cycle (x,y,...,z,x)
-        push!(aCasser,aCasser[1])
-        ## On créait alors les différentes composantes de la contrainte à casser
-        x=m[:x]
-        expr = AffExpr()
-        i = 1
-        while (i <= tailleACasser )
-            push!(expr,1.0,x[aCasser[i],aCasser[i+1]])
-
-            i = i + 1
-        end
-        con = @constraint(m,expr <= (tailleACasser - 1))
-        println("> Nouvelle contrainte : ", con)
-        println()
-        println("> Nouvelle résolution après ajout de la nouvelle contrainte !")
-        nbiter = nbiter + 1
-        status = solve(m)
-        imp(m)
-        ############################################################################
-        P = permutation(getvalue(m[:x]))
-        nbPoint = size(P,1)
-        etat = zeros(Int64,nbPoint)
-        pere = zeros(Int64,nbPoint)
-        cycle = explorer(P,etat,pere)
-        println("> Cycle(s) trouvé(s) : ", cycle)
-        nbcycle = length(cycle)
-        println("> Nombre de cycle(s) trouvé(s) : ",nbcycle)
-        println()
-    end
-    ################################################################################
-    ################################################################################
-    ## Au sortir de la boucle, on est sûr d'avoir casser tous les sous cycles et de n'avoir qu'un seul cycle
-    println("FIN - Problème résolu :")
-    imp(m)
-    println("> Nombre d'itération nécéssaires : ", nbiter)
-    println("> Ordre de parcours des drônes : ")
-    imp_cycle(cycle[1])
-
-end
-=#
-################################################################################
-################################################################################
-################################################################################
-################################################################################
-
-
-
-################################################################################
-################################################################################
-################################################################################
-##########################    APPROCHÉE  #######################################
-################################################################################
-################################################################################
-################################################################################
-## ATTENTION DANS CE CAS LÀ, LE DISTANCIER DOIT ÊTRE SYMÉTRIQUE
-
-
-
-#=
-C = [
-10000	786	549	657	331	559	250;
-786	10000	668	979	593	224	905;
-549	668	10000	316	607	472	467;
-657	979	316	10000	890	769	400;
-331	593	607	890	10000	386	559;
-559	224	472	769	386	10000	681;
-250	905	467	400	559	681	10000;
-]
-X = [
-10000	786	549	657	331	559	250;
-786	10000	668	979	593	224	905;
-549	668	10000	316	607	472	467;
-657	979	316	10000	890	769	400;
-331	593	607	890	10000	386	559;
-559	224	472	769	386	10000	681;
-250	905	467	400	559	681	10000;
-]
-=#
 
 function calculCout(C::Array{Int64,2},P::Array{Int64,1})
     T = 0
@@ -385,6 +238,7 @@ function calculCout(C::Array{Int64,2},P::Array{Int64,1})
 end
 
 function procheVoisin(X::Array{Int64,2},dep::Int64)
+    println("Proches voisins ")
     #dep = 1
     nbPoint = size(X,1)
     ## Matrice des points visités
@@ -422,14 +276,13 @@ function procheVoisin(X::Array{Int64,2},dep::Int64)
     return succ
 end
 
-
 function opt2(P::Array{Int64,1},dep::Int64)
-    ## P, le parcours
+    ## P, le parcours initial
     nbSommet = size(P,1)
     ## Le point de départ
     x = dep
     amelio = false
-    println("##################")
+    cpt = 0
     println("Parcours de base :")
     println(P)
     println("Coût de base :")
@@ -459,6 +312,7 @@ function opt2(P::Array{Int64,1},dep::Int64)
                     delta = C1 + C2 - C3 - C4
                     #println("           Δ((",x,",",P[x],");(",y,",",P[y],") = ", delta)
                     if (delta < 0 )
+                        cpt = cpt + 1
                         println("#########################################################################################")
                         println("Δ < 0 trouvé : ")
                         # Création d'une copie profonde du trajet initial pour amélioration potentielle
@@ -494,141 +348,204 @@ function opt2(P::Array{Int64,1},dep::Int64)
                 x = P[x]
             end
     end
+    println("Nombre de solutions potentiellement améliorantes détectées : ", cpt)
     return P
 end
 
+#######################################################################
+#######################################################################
+#######################################################################
+#######################################################################
+#######################################################################
+#######################################################################
 
-
-
-C = parseTSP("plat/exemple.dat")
-## Création d'une copie de la matrice que l'on va dégrader pour la recherche des plus proches voisins
-X = copy(C)
-## Point de départ de la recherche
-dep = 1
-P = procheVoisin(X,dep)
-CoutAV = calculCout(C,P)
-O = opt2(P,dep)
-CoutAP = calculCout(C,O)
-## Variation constaté
-println("Cout AV = ", CoutAV)
-println("Cout AP = ", CoutAP)
-Var =  CoutAP - CoutAV
-println("Delta coût : ", Var )
-
-
-
-
-
-
-
-
-
-
+#C = parseTSP("plat/exemple.dat")
+#C = parseTSP("plat/plat10.dat")
+#C = parseTSP("plat/plat20.dat")
+#C = parseTSP("plat/plat30.dat")
+#C = parseTSP("plat/plat40.dat")
+#C = parseTSP("plat/plat50.dat")
+#C = parseTSP("plat/plat60.dat")
+#C = parseTSP("plat/plat70.dat")
+#C = parseTSP("plat/plat80.dat")
+#C = parseTSP("plat/plat90.dat")
+#C = parseTSP("plat/plat100.dat")
+#C = parseTSP("plat/plat110.dat")
+#C = parseTSP("plat/plat120.dat")
+#C = parseTSP("plat/plat130.dat")
+#C = parseTSP("plat/plat140.dat")
+#C = parseTSP("plat/plat150.dat")
 
 
 
 
+#C = parseTSP("relief/relief10.dat")
+#C = parseTSP("relief/relief20.dat")
+#C = parseTSP("relief/relief30.dat")
+#C = parseTSP("relief/relief40.dat")
+#C = parseTSP("relief/relief50.dat")
+#C = parseTSP("relief/relief60.dat")
+#C = parseTSP("relief/relief70.dat")
+#C = parseTSP("relief/relief80.dat")
+#C = parseTSP("relief/relief90.dat")
+#C = parseTSP("relief/relief100.dat")
+#C = parseTSP("relief/relief110.dat")
+#C = parseTSP("relief/relief120.dat")
+#C = parseTSP("relief/relief130.dat")
+#C = parseTSP("relief/relief140.dat")
+#C = parseTSP("relief/relief150.dat")
+
+# Nom = "plat/plat10.dat"
+ Nom = "plat/plat20.dat"
+# Nom = "plat/plat30.dat"
+# Nom = "plat/plat40.dat"
+# Nom = "plat/plat50.dat"
+# Nom = "plat/plat60.dat"
+# Nom = "plat/plat70.dat"
+# Nom = "plat/plat80.dat"
+# Nom = "plat/plat90.dat"
+# Nom = "plat/plat100.dat"
+# Nom = "plat/plat110.dat"
+# Nom = "plat/plat120.dat"
+# Nom = "plat/plat130.dat"
+# Nom = "plat/plat140.dat"
+# Nom = "plat/plat150.dat"
+
+C = parseTSP(Nom)
+outfile = Nom*" - res.txt"
+# writing to files is very similar:
+f = open(outfile, "w")
+# both print and println can be used as usual but with f as their first arugment
 
 
-## PATH MAC
-## cd Desktop/ÉTUDES/FAC/S6/RO/TP/3TP/projetRO
+################################################################################
+################################################################################
+################################################################################
+##########################    EXACTE  ##########################################
+################################################################################
+################################################################################
+################################################################################
 
-## m est notre modèle
-
-# Matrice des contraintes :
-#=
-C = parseTSP("plat/exemple.dat")
-m = TSP(C)
-status = solve(m)
-imp(m)
-
-## Attention : xval ne sont pas les variables de décisions mais les valeurs de variables - xval est un alias bien pratique
-## x représente les variables de décision du modèle :
-xval = getvalue(m[:x])
-P=permutation(xval)
-=#
-
-#=
+@time begin
+    println(f,"Résolution exacte pour ", Nom ," points à visiter :")
+    #println("Résolution exacte pour ", Nom ," points à visiter :")
+    nbiter = 1
+    nbcycle = 0
+    ## Compteur d'itération avant l'obtention d'une solution optimale par la solution exacte
+    nbiter = 1
+    ## Compteur du nombre de contrainte ajoutées
+    nbctr = 0
+    #######################################################################
+    #######################################################################
+    println(f,"Résolution d'initiale :  ")
+    #println("Résolution d'initiale :  ")
+    m = TSP(C)
+    status = solve(m)
+    imp(m)
+    ## Attention : xval ne sont pas les variables de décisions mais les valeurs de variables - xval est un alias bien pratique
+    ## x représente les variables de décision du modèle : xval = getvalue(m[:x]) P=permutation(xval)
+    P = permutation(getvalue(m[:x]))
     nbPoint = size(P,1)
     etat = zeros(Int64,nbPoint)
     pere = zeros(Int64,nbPoint)
-
     cycle = explorer(P,etat,pere)
-    ## tester ici nbcycle = length(cycle)
+    println(f,"> Cycle(s) trouvé(s) : ", cycle)
+    #println("> Cycle(s) trouvé(s) : ", cycle)
+    nbcycle = length(cycle)
+    println(f,"> Nombre de cycle(s) trouvé(s) : ",nbcycle)
+    #println("> Nombre de cycle(s) trouvé(s) : ",nbcycle)
+    println()
+#######################################################################
+#######################################################################
+    while(nbcycle!= 1)
+        println(f,"Itération n° ", nbiter," Cassage de contrainte ")
+        #println("Itération n° ", nbiter," Cassage de contrainte ")
+        ind = ind_min(cycle)
+        aCasser = cycle[ind]
+        ## ex : aCasser = [5, 8, 14, 13, 15]
+        println(f,"> Cycle à casser : ", aCasser)
+        #println("> Cycle à casser : ", aCasser)
+        ## Récupérer la taille du cycle
+        tailleACasser = length(aCasser)
+        println(f,"> Taille du cycle à casser : ", tailleACasser)
+        #println("> Taille du cycle à casser : ", tailleACasser)
+        ## Ajouter le premier élément du cycle à casser pour que aCasser forme un cycle (x,y,...,z,x)
+        push!(aCasser,aCasser[1])
+        ## On créait alors les différentes composantes de la contrainte à casser
+        x=m[:x]
+        expr = AffExpr()
+        i = 1
+        while (i <= tailleACasser )
+            push!(expr,1.0,x[aCasser[i],aCasser[i+1]])
+            i = i + 1
+        end
+        con = @constraint(m,expr <= (tailleACasser - 1))
+        println(f,"> Nouvelle contrainte : ", con)
+        #println("> Nouvelle contrainte : ", con)
+        nbctr = nbctr + 1
+        println()
+        println(f,"> Nouvelle résolution après ajout de la nouvelle contrainte !")
+        #println("> Nouvelle résolution après ajout de la nouvelle contrainte !")
+        nbiter = nbiter + 1
+        status = solve(m)
+        imp(m)
+        ############################################################################
+        P = permutation(getvalue(m[:x]))
+        nbPoint = size(P,1)
+        etat = zeros(Int64,nbPoint)
+        pere = zeros(Int64,nbPoint)
+        cycle = explorer(P,etat,pere)
+        println(f,"> Cycle(s) trouvé(s) : ", cycle)
+        #println("> Cycle(s) trouvé(s) : ", cycle)
+        nbcycle = length(cycle)
+        println(f,"> Nombre de cycle(s) trouvé(s) : ",nbcycle)
+        #println("> Nombre de cycle(s) trouvé(s) : ",nbcycle)
+        println(f,"")
+        #println()
+    end
+    ################################################################################
+    ################################################################################
+    ## Au sortir de la boucle, on est sûr d'avoir casser tous les sous cycles et de n'avoir qu'un seul cycle
+    println(f,"FIN - Problème résolu :")
+    #println("FIN - Problème résolu :")
+    imp(m)
+    #println("> Nombre d'itération nécéssaires : ", nbiter)
+    println(f,"> Nombre d'itération nécéssaires : ", nbiter)
+    #println("> Nombre de contraintes ajoutées : ", nbctr)
+    println(f,"> Nombre de contraintes ajoutées : ", nbctr)
+    #println("> Ordre de parcours des drônes : ")
+    println(f,"> Ordre de parcours des drônes : ")
+    imp_cycle(cycle[1])
+end
 
-=#
+close(f)
+
+
+################################################################################
+################################################################################
+################################################################################
+##########################    APPROCHÉE  #######################################
+################################################################################
+################################################################################
+################################################################################
+## ATTENTION DANS CE CAS LÀ, LE DISTANCIER DOIT ÊTRE SYMÉTRIQUE
+
 #=
-ind = ind_min(cycle)
-## cycle à détruire.
-destr = cycle[ind]
-i = destr[1]
-j = destr[2]
+    C = parseTSP("plat/exemple.dat")
+    ## Création d'une copie de la matrice que l'on va dégrader pour la recherche des plus proches voisins
+    X = copy(C)
+    ## Point de départ de la recherche
+    dep = 1
+    P = procheVoisin(X,dep)
+    CoutAV = calculCout(C,P)
+    @time begin
+    O = opt2(P,dep)
+    end
+    CoutAP = calculCout(C,O)
+    ## Variation constaté
+    println("Cout AV = ", CoutAV)
+    println("Cout AP = ", CoutAP)
+    Var =  CoutAP - CoutAV
+    println("Delta coût : ", Var )
 
-
-x=m[:x]
-expr = AffExpr()
-push!(expr,1.0,x[i,j])
-push!(expr,1.0,x[j,i])
-## @constraint(m::Model, con) - add linear or quadratic constraints.
-con = @constraint(m,expr <= 1)
-
-
-## julia> m
-## Minimization problem with:
-## * 28 linear constraints
-## * 49 variables: 49 binary
-## julia> con = @constraint(m,expr <= 1)
-## x[2,6] + x[6,2] ≤ 1
-## julia> m
-## Minimization problem with:
-## * 29 linear constraints
-## * 49 variables: 49 binary
-## Solver is GLPKInterfaceMIP
-
-status = solve(m)
-imp(m)
-xval = getvalue(m[:x])
-P=permutation(xval)
-
-
-nbPoint = size(P,1)
-etat = zeros(Int64,nbPoint)
-pere = zeros(Int64,nbPoint)
-
-cycle = explorer(P,etat,pere)
-length(cycle)
-
-
-
-
-
-CONTINUER A TROUVER LES CYCLES ET SOLVER LE PROBLEME TANT QUE LE NOMBRE DE CYCLE EST DIFFERENT DE 1
-## NECESSITE UNE AUTOMATISATION A BASE DE TANT QUE.
-Idée : au début, pour initialiser la boucle, on peut définir le compteur nbcycle = 0.
-Tant quu'il n'y a pas au moins un cycle. continuer le processus de suppression
-
-
-
-
-=#
-
-
-
-
-## Attention, le distancier est symétrique, il est donc possible de trouver deux cycles différents.
-
-
-
-
-#=
-## Déclaration permutations suivantes pour test
-T = [7;5;4;3;6;2;1]
-
-
-=#
-
-
-
-#=
-    Idée, utiliser la commande push! ajouter progressivement dans le modele les contraintes de cassage de cycle que l'on va trouvé
 =#
