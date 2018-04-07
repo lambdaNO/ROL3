@@ -1,0 +1,34 @@
+Bonjour,
+
+On travaille sur le sous problème du voyageur de commerce visant à déterminer l'ordre de visite des points d'intérêts 
+
+
+
+Le probleme du voyageur de commerce, ou TSP pourTraveling-Salesman Problem, consiste, pour un graphe donne,de determiner un cycle hamiltonien dont la longueur estminimale.
+
+Soit G = (V,E) un graphe, et soit d une fonction positive sur les arêtes, on appelle circuit Hamiltonien unchemin fermé passant par tous les sommets v ∈ V. De manière duale, on appelle circuit Eulérien unchemin fermé passant par toutes les arêtes e ∈ E. Le problème du voyageur de commerce revient ainsi àtrouver un circuit Hamiltonien de longueur minimale dans le graphe de distance des villes.
+
+PERMET DE GÉNÉRER UNE BORNE INFÉRIEURE ET DE PROGRESSIVEMENT VENIR AFFINER LA SOLUTION PAR AJOUT SUCCESSIF DE CONTRAINTES
+
+
+J'attends une démonstration mathématique rigoureuse. En réalité, il n'y a qu'une preuve à écrire et elle est très courte.
+
+Indication (donnée à certains étudiants m'ayant questionné pendant les TP) :
+	
+	a) Que peut-on dire de la région admissible de sous-problèmes par rapport à la région admissible du problème de voyageur de commerce?
+
+La région admissible du problème du voyageur de commerce est inclue dans la région admissible des sous problèmes que l'on résout. 
+Par ajout successif de contrainte, on tend à se rapprocher de la région admissible du problème du voyageur de commerce.
+
+	b) Quel lien peut-on en déduire entre la valeur optimale de ces sous-problèmes et la valeur optimale du problème de voyageur de commerce?
+	c) La condition d'arrêt de l'algorithme est d'obtenir une solution composée d'un seul cycle, c'est-à-dire une solution admissible pour le problème de voyageur de commerce. Quel lien y-a-t-il entre la valeur d'une solution admissible et la valeur optimale?
+	d) Conclusion?
+
+Cordialement,
+Anthony Przybylski
+
+
+
+#https://zestedesavoir.com/tutoriels/681/a-la-decouverte-des-algorithmes-de-graphe/727_bases-de-la-theorie-des-graphes/3353_parcourir-un-graphe/
+
+

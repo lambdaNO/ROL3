@@ -53,8 +53,8 @@ end
 
 function imp(m::Model)
     if status == :Optimal
-        #println("> temps total = ",getobjectivevalue(m))
-        println(f,"> temps total = ",getobjectivevalue(m))
+        println("> temps total = ",getobjectivevalue(m))
+        #println(f,"> temps total = ",getobjectivevalue(m))
         #println("Ordre de visite des points :", permutation(getvalue(m[:x])))
     elseif status == :Unbounded
         println("Problème non-borné")
@@ -125,13 +125,13 @@ end
 function permutation(X::Array{Float64,2})
     nbPoint = size(X,1)
     V=[0 for i in 1:nbPoint]
-        #println("   Permutations :")
-        println(f,"   Permutations :")
+        println("   Permutations :")
+        #println(f,"   Permutations :")
         for i in 1:nbPoint
             for j in 1:nbPoint
                 if (X[i,j]==1)
-                    #print("(",i," -> ",j,") ")
-                    print(f,"(",i," -> ",j,") ")
+                    print("(",i," -> ",j,") ")
+                    #print(f,"(",i," -> ",j,") ")
                     V[i]=j
                 end
             end
@@ -181,6 +181,7 @@ function explorer(G::Array{Int64,1},etat::Array{Int64,1},pere::Array{Int64,1})
     for i in 1:nbPoint
         #println("   EXP : Etat de ", i, " : avant exploration : ", etat[i])
         if (etat[i] ==0)
+            ## Il n'a pas été visité pour le moment. Il est potentiellement le départ d'un nouveau (sous) cycle
             pere[i] = 0
             ## On passe le vecteur [0] en paramètre pour que l'on puisse pusher à l'intérieur
             ss_cycle = DFS(G,i,[0],etat,pere)
@@ -212,13 +213,13 @@ end
 
 function imp_cycle(C::Array{Int64,1})
     for i = 1:length(C)
-        #print(C[i]," -> ")
-        print(f,C[i]," -> ")
+        print(C[i]," -> ")
+        #print(f,C[i]," -> ")
     end
-    #print(C[1],". ")
-    print(f,C[1],". ")
-    #println()
-    println(f,"")
+    print(C[1],". ")
+    #print(f,C[1],". ")
+    println()
+    #println(f,"")
 end
 
 function calculCout(C::Array{Int64,2},P::Array{Int64,1})
@@ -238,8 +239,8 @@ function calculCout(C::Array{Int64,2},P::Array{Int64,1})
 end
 
 function procheVoisin(X::Array{Int64,2},dep::Int64)
-    #println("Proches voisins ")
-    println(f,"Proches voisins ")
+    println("Proches voisins ")
+    #println(f,"Proches voisins ")
     #dep = 1
     nbPoint = size(X,1)
     ## Matrice des points visités
@@ -272,9 +273,8 @@ function procheVoisin(X::Array{Int64,2},dep::Int64)
     succ[x] = dep
     push!(parc,dep)
     #println("E : ", etat)#println("S : ", succ)
-    #println("P : ", parc)
-    println(f,"P : ", parc)
-    #return parc
+    println("P : ", parc)
+    #println(f,"P : ", parc)
     return succ
 end
 
@@ -285,17 +285,18 @@ function opt2(P::Array{Int64,1},dep::Int64)
     x = dep
     amelio = false
     cpt = 0
-    # println("Parcours de base :")
-    # println(P)
-    # println("Coût de base :")
-    # println(calculCout(C,P))
-    # println("##################")
+    nbcompa = 0
+    println("Parcours de base :")
+    println(P)
+    println("Coût de base :")
+    println(calculCout(C,P))
+    println("##################")
 
-    println(f,"Parcours de base :")
-    println(f,P)
-    println(f,"Coût de base :")
-    println(f,calculCout(C,P))
-    println(f,"##################")
+    # println(f,"Parcours de base :")
+    # println(f,P)
+    # println(f,"Coût de base :")
+    # println(f,calculCout(C,P))
+    # println(f,"##################")
 
     while (amelio == false)
         while(P[x]!=1 && amelio != true)
@@ -303,7 +304,9 @@ function opt2(P::Array{Int64,1},dep::Int64)
             #println("Arc Base : (", x,",",P[x],")")
                 y = P[P[x]]
                 for j in 1:nbSommet-3
-                    #println("   y = ", y,"| P[y] = ", P[y]) #println("   Arc Pivot : (", y,",",P[y],")")
+                    nbcompa = nbcompa + 1
+                    #println("   y = ", y,"| P[y] = ", P[y]) #
+                    #println("   Arc Pivot : (", y,",",P[y],")")
                     ###########################################
                     ###########################################
                     ### Etude Delta :
@@ -322,14 +325,14 @@ function opt2(P::Array{Int64,1},dep::Int64)
                     #println("           Δ((",x,",",P[x],");(",y,",",P[y],") = ", delta)
                     if (delta < 0 )
                         cpt = cpt + 1
-                        # println("#########################################################################################")
-                        # println("Δ < 0 trouvé : ")
-                        println(f,"#########################################################################################")
-                        println(f,"Δ < 0 trouvé : ")
+                        println("#########################################################################################")
+                        println("Δ < 0 trouvé : ")
+                        #println(f,"#########################################################################################")
+                        #println(f,"Δ < 0 trouvé : ")
                         # Création d'une copie profonde du trajet initial pour amélioration potentielle
                         T = copy(P)
-                        #println("           Δ((i = ",x,", j = ",T[x],");(i' = ",y,", j' = ",T[y],") = ", delta)
-                        println(f,"           Δ((i = ",x,", j = ",T[x],");(i' = ",y,", j' = ",T[y],") = ", delta)
+                        println("           Δ((i = ",x,", j = ",T[x],");(i' = ",y,", j' = ",T[y],") = ", delta)
+                        #println(f,"           Δ((i = ",x,", j = ",T[x],");(i' = ",y,", j' = ",T[y],") = ", delta)
                         ## Modication à effectuer : (i=x,j=P[x]) devient (i=x,i'=y) (1) | (i'=y,j'=P[y]) devient (j=P[x],j'=P[y])
                         #println("i - x = ", x);println("j - P[x]= ",P[x]);println("i' - y = ", y);println("j' - P[y]= ",P[y])
                         ## Modification dans T (la copie)
@@ -337,43 +340,46 @@ function opt2(P::Array{Int64,1},dep::Int64)
                         T[y]=T[x]
                         T[x] = y
                         T[T[y]] = tmpy
-                        # println("           Parcours initial : ", P)
-                        # println("           Parcours modifié : ", T)
-                        # println("           Coût init ", calculCout(C,P), " - Coût modif ", calculCout(C,T))
-                        # println("           Variation de coût : ", calculCout(C,T) - calculCout(C,P))
+                        println("           Parcours initial : ", P)
+                        println("           Parcours modifié : ", T)
+                        println("           Coût init ", calculCout(C,P), " - Coût modif ", calculCout(C,T))
+                        println("           Variation de coût : ", calculCout(C,T) - calculCout(C,P))
 
-                        println(f,"           Parcours initial : ", P)
-                        println(f,"           Parcours modifié : ", T)
-                        println(f,"           Coût init ", calculCout(C,P), " - Coût modif ", calculCout(C,T))
-                        println(f,"           Variation de coût : ", calculCout(C,T) - calculCout(C,P))
+                        #println(f,"           Parcours initial : ", P)
+                        #println(f,"           Parcours modifié : ", T)
+                        #println(f,"           Coût init ", calculCout(C,P), " - Coût modif ", calculCout(C,T))
+                        #println(f,"           Variation de coût : ", calculCout(C,T) - calculCout(C,P))
 
 
                         ## Si la solution obtenue après amélioration (T) possède un cout inférieur à la solution de départ (P).
                         ## Alors T devient le nouveau parcours
                         ## Sinon, on continu à chercher
                         if (calculCout(C,P) > calculCout(C,T))
-                            #println("           > Coût inférieur obtenu avec ce nouveau parcours -> Solution améliorante.")
-                            println(f,"           > Coût inférieur obtenu avec ce nouveau parcours -> Solution améliorante.")
+                            println("           > Coût inférieur obtenu avec ce nouveau parcours -> Solution améliorante.")
+                            #println(f,"           > Coût inférieur obtenu avec ce nouveau parcours -> Solution améliorante.")
 
                             P = copy(T)
                             amelio = true
                         else
-                            #println("           > Coût supérieur obtenu avec ce nouveau parcours -> Solution non améliorante.")
-                            println(f,"           > Coût supérieur obtenu avec ce nouveau parcours -> Solution non améliorante.")
+                            println("           > Coût supérieur obtenu avec ce nouveau parcours -> Solution non améliorante.")
+                            #println(f,"           > Coût supérieur obtenu avec ce nouveau parcours -> Solution non améliorante.")
                         end
-                        #println("           Parcours retourné : ", P)
-                        #println("#########################################################################################")
-                        println(f,"           Parcours retourné : ", P)
-                        println(f,"#########################################################################################")
+                        println("           Parcours retourné : ", P)
+                        println("#########################################################################################")
+                        #println(f,"           Parcours retourné : ", P)
+                        #println(f,"#########################################################################################")
                     end
                 ###########################################
                     y = P[y]
                 end
                 x = P[x]
             end
+            amelio = true # Je le rajoute sinon on boucle à l'infini si il ne trouve pas de solution améliorante
     end
-    println(f,"Nombre de solutions potentiellement améliorantes détectées : ", cpt)
-    #println("Nombre de solutions potentiellement améliorantes détectées : ", cpt)
+    #println(f,"Nombre de solutions potentiellement améliorantes détectées : ", cpt)
+    println("Nombre de solutions potentiellement améliorantes détectées : ", cpt)
+    println("Nombre de comparaisons effectuées : ", nbcompa)
+
     return P
 end
 
@@ -388,163 +394,7 @@ end
 
 #C = parseTSP("relief/relief10.dat")
 
-
-#Nom = "plat/plat10.dat"
-# Nom = "plat/plat20.dat"
-# Nom = "plat/plat30.dat"
-# Nom = "plat/plat40.dat"
-# Nom = "plat/plat50.dat"
-# Nom = "plat/plat60.dat"
-# Nom = "plat/plat70.dat"
-# Nom = "plat/plat80.dat"
-# Nom = "plat/plat90.dat"
-# Nom = "plat/plat100.dat"
-# Nom = "plat/plat110.dat"
-# Nom = "plat/plat120.dat"
-# Nom = "plat/plat130.dat"
-# Nom = "plat/plat140.dat"
-# Nom = "plat/plat150.dat"
-
-
-#Nom = "relief/relief10.dat"
-# Nom = "relief/relief20.dat"
-# Nom = "relief/relief30.dat"
-# Nom = "relief/relief40.dat"
-# Nom = "relief/relief50.dat"
-# Nom = "relief/relief60.dat"
-# Nom = "relief/relief70.dat"
-# Nom = "relief/relief80.dat"
-# Nom = "relief/relief90.dat"
-# Nom = "relief/relief100.dat"
-# Nom = "relief/relief110.dat"
-# Nom = "relief/relief120.dat"
-# Nom = "relief/relief130.dat"
-# Nom = "relief/relief140.dat"
-# Nom = "relief/relief150.dat"
-
-
-#=
-C = parseTSP(Nom)
-outfile = Nom*"EXA - res.txt"
-# writing to files is very similar:
-f = open(outfile, "w")
-# both print and println can be used as usual but with f as their first arugment
-=#
-
-################################################################################
-################################################################################
-################################################################################
-##########################    EXACTE  ##########################################
-################################################################################
-################################################################################
-################################################################################
-#=
-@time begin
-    println(f,"Résolution exacte pour ", Nom ," points à visiter :")
-    #println("Résolution exacte pour ", Nom ," points à visiter :")
-    nbiter = 1
-    nbcycle = 0
-    ## Compteur d'itération avant l'obtention d'une solution optimale par la solution exacte
-    nbiter = 1
-    ## Compteur du nombre de contrainte ajoutées
-    nbctr = 0
-    #######################################################################
-    #######################################################################
-    println(f,"Résolution d'initiale :  ")
-    #println("Résolution d'initiale :  ")
-    m = TSP(C)
-    status = solve(m)
-    imp(m)
-    ## Attention : xval ne sont pas les variables de décisions mais les valeurs de variables - xval est un alias bien pratique
-    ## x représente les variables de décision du modèle : xval = getvalue(m[:x]) P=permutation(xval)
-    P = permutation(getvalue(m[:x]))
-    nbPoint = size(P,1)
-    etat = zeros(Int64,nbPoint)
-    pere = zeros(Int64,nbPoint)
-    cycle = explorer(P,etat,pere)
-    println(f,"> Cycle(s) trouvé(s) : ", cycle)
-    #println("> Cycle(s) trouvé(s) : ", cycle)
-    nbcycle = length(cycle)
-    println(f,"> Nombre de cycle(s) trouvé(s) : ",nbcycle)
-    #println("> Nombre de cycle(s) trouvé(s) : ",nbcycle)
-    println()
-#######################################################################
-#######################################################################
-    while(nbcycle!= 1)
-        println(f,"Itération n° ", nbiter," Cassage de contrainte ")
-        #println("Itération n° ", nbiter," Cassage de contrainte ")
-        ind = ind_min(cycle)
-        aCasser = cycle[ind]
-        ## ex : aCasser = [5, 8, 14, 13, 15]
-        println(f,"> Cycle à casser : ", aCasser)
-        #println("> Cycle à casser : ", aCasser)
-        ## Récupérer la taille du cycle
-        tailleACasser = length(aCasser)
-        println(f,"> Taille du cycle à casser : ", tailleACasser)
-        #println("> Taille du cycle à casser : ", tailleACasser)
-        ## Ajouter le premier élément du cycle à casser pour que aCasser forme un cycle (x,y,...,z,x)
-        push!(aCasser,aCasser[1])
-        ## On créait alors les différentes composantes de la contrainte à casser
-        x=m[:x]
-        expr = AffExpr()
-        i = 1
-        while (i <= tailleACasser )
-            push!(expr,1.0,x[aCasser[i],aCasser[i+1]])
-            i = i + 1
-        end
-        con = @constraint(m,expr <= (tailleACasser - 1))
-        println(f,"> Nouvelle contrainte : ", con)
-        #println("> Nouvelle contrainte : ", con)
-        nbctr = nbctr + 1
-        println()
-        println(f,"> Nouvelle résolution après ajout de la nouvelle contrainte !")
-        #println("> Nouvelle résolution après ajout de la nouvelle contrainte !")
-        nbiter = nbiter + 1
-        status = solve(m)
-        imp(m)
-        ############################################################################
-        P = permutation(getvalue(m[:x]))
-        nbPoint = size(P,1)
-        etat = zeros(Int64,nbPoint)
-        pere = zeros(Int64,nbPoint)
-        cycle = explorer(P,etat,pere)
-        println(f,"> Cycle(s) trouvé(s) : ", cycle)
-        #println("> Cycle(s) trouvé(s) : ", cycle)
-        nbcycle = length(cycle)
-        println(f,"> Nombre de cycle(s) trouvé(s) : ",nbcycle)
-        #println("> Nombre de cycle(s) trouvé(s) : ",nbcycle)
-        println(f,"")
-        #println()
-    end
-    ################################################################################
-    ################################################################################
-    ## Au sortir de la boucle, on est sûr d'avoir casser tous les sous cycles et de n'avoir qu'un seul cycle
-    println(f,"FIN - Problème résolu :")
-    #println("FIN - Problème résolu :")
-    imp(m)
-    #println("> Nombre d'itération nécéssaires : ", nbiter)
-    println(f,"> Nombre d'itération nécéssaires : ", nbiter)
-    #println("> Nombre de contraintes ajoutées : ", nbctr)
-    println(f,"> Nombre de contraintes ajoutées : ", nbctr)
-    #println("> Ordre de parcours des drônes : ")
-    println(f,"> Ordre de parcours des drônes : ")
-    imp_cycle(cycle[1])
-end
-
-close(f)
-=#
-
-
-################################################################################
-################################################################################
-################################################################################
-##########################    APPROCHÉE  #######################################
-################################################################################
-################################################################################
-################################################################################
-## ATTENTION DANS CE CAS LÀ, LE DISTANCIER DOIT ÊTRE SYMÉTRIQUE
-
-Nom = "plat/exemple.dat"
+#Nom = "plat/exemple.dat"
 # Nom = "plat/plat10.dat"
 # Nom = "plat/plat20.dat"
 # Nom = "plat/plat30.dat"
@@ -562,14 +412,176 @@ Nom = "plat/exemple.dat"
 # Nom = "plat/plat150.dat"
 
 
+# Nom = "relief/relief10.dat"
+# Nom = "relief/relief20.dat"
+# Nom = "relief/relief30.dat"
+# Nom = "relief/relief40.dat"
+# Nom = "relief/relief50.dat"
+# Nom = "relief/relief60.dat"
+# Nom = "relief/relief70.dat"
+# Nom = "relief/relief80.dat"
+# Nom = "relief/relief90.dat"
+# Nom = "relief/relief100.dat"
+# Nom = "relief/relief110.dat"
+# Nom = "relief/relief120.dat"
+# Nom = "relief/relief130.dat"
+# Nom = "relief/relief140.dat"
+# Nom = "relief/relief150.dat"
+#=
 C = parseTSP(Nom)
-outfile = Nom*"APP - res.txt"
+
+C = parseTSP(Nom)
+outfile = Nom*"EXA - res.txt"
 # writing to files is very similar:
 f = open(outfile, "w")
 # both print and println can be used as usual but with f as their first arugment
+=#
+
+################################################################################
+################################################################################
+################################################################################
+##########################    EXACTE  ##########################################
+################################################################################
+################################################################################
+################################################################################
+#=
+@time begin
+    #println(f,"Résolution exacte pour ", Nom ," points à visiter :")
+    println("Résolution exacte pour ", Nom ," points à visiter :")
+    nbiter = 1
+    nbcycle = 0
+    ## Compteur d'itération avant l'obtention d'une solution optimale par la solution exacte
+    nbiter = 1
+    ## Compteur du nombre de contrainte ajoutées
+    nbctr = 0
+    ## Vecteur de taille des contraintes à casser - Partie expérimentale
+    Tctr = [0]
+    #######################################################################
+    #######################################################################
+    #println(f,"Résolution d'initiale :  ")
+    println("Résolution d'initiale :  ")
+    m = TSP(C)
+    status = solve(m)
+    imp(m)
+    ## Attention : xval ne sont pas les variables de décisions mais les valeurs de variables - xval est un alias bien pratique
+    ## x représente les variables de décision du modèle : xval = getvalue(m[:x]) P=permutation(xval)
+    P = permutation(getvalue(m[:x]))
+    nbPoint = size(P,1)
+    etat = zeros(Int64,nbPoint)
+    pere = zeros(Int64,nbPoint)
+    cycle = explorer(P,etat,pere)
+    #println(f,"> Cycle(s) trouvé(s) : ", cycle)
+    println("> Cycle(s) trouvé(s) : ", cycle)
+    nbcycle = length(cycle)
+    #println(f,"> Nombre de cycle(s) trouvé(s) : ",nbcycle)
+    println("> Nombre de cycle(s) trouvé(s) : ",nbcycle)
+    println()
+#######################################################################
+#######################################################################
+    while(nbcycle!= 1)
+        #println(f,"Itération n° ", nbiter," Cassage de contrainte ")
+        println("Itération n° ", nbiter," Cassage de contrainte ")
+        ind = ind_min(cycle)
+        aCasser = cycle[ind]
+        ## ex : aCasser = [5, 8, 14, 13, 15]
+        #println(f,"> Cycle à casser : ", aCasser)
+        println("> Cycle à casser : ", aCasser)
+        ## Récupérer la taille du cycle
+        tailleACasser = length(aCasser)
+        #println(f,"> Taille du cycle à casser : ", tailleACasser)
+        println("> Taille du cycle à casser : ", tailleACasser)
+        push!(Tctr,tailleACasser)
+        ## Ajouter le premier élément du cycle à casser pour que aCasser forme un cycle (x,y,...,z,x)
+        push!(aCasser,aCasser[1])
+        ## On créait alors les différentes composantes de la contrainte à casser
+        x=m[:x]
+        expr = AffExpr()
+        i = 1
+        while (i <= tailleACasser )
+            push!(expr,1.0,x[aCasser[i],aCasser[i+1]])
+            i = i + 1
+        end
+        con = @constraint(m,expr <= (tailleACasser - 1))
+        #println(f,"> Nouvelle contrainte : ", con)
+        println("> Nouvelle contrainte : ", con)
+        nbctr = nbctr + 1
+        println()
+        #println(f,"> Nouvelle résolution après ajout de la nouvelle contrainte !")
+        println("> Nouvelle résolution après ajout de la nouvelle contrainte !")
+        nbiter = nbiter + 1
+        status = solve(m)
+        imp(m)
+        ############################################################################
+        P = permutation(getvalue(m[:x]))
+        nbPoint = size(P,1)
+        etat = zeros(Int64,nbPoint)
+        pere = zeros(Int64,nbPoint)
+        cycle = explorer(P,etat,pere)
+        #println(f,"> Cycle(s) trouvé(s) : ", cycle)
+        println("> Cycle(s) trouvé(s) : ", cycle)
+        nbcycle = length(cycle)
+        #println(f,"> Nombre de cycle(s) trouvé(s) : ",nbcycle)
+        println("> Nombre de cycle(s) trouvé(s) : ",nbcycle)
+        #println(f,"")
+        println()
+    end
+    ################################################################################
+    ################################################################################
+    ## Au sortir de la boucle, on est sûr d'avoir casser tous les sous cycles et de n'avoir qu'un seul cycle
+    #println(f,"FIN - Problème résolu :")
+    println("FIN - Problème résolu :")
+    imp(m)
+    println("> Nombre d'itération nécéssaires : ", nbiter)
+    #println(f,"> Nombre d'itération nécéssaires : ", nbiter)
+    println("> Nombre de contraintes ajoutées : ", nbctr)
+    #println(f,"> Nombre de contraintes ajoutées : ", nbctr)
+    println("> Ordre de parcours des drônes : ")
+    #println(f,"> Ordre de parcours des drônes : ")
+    imp_cycle(cycle[1])
+    ## Affichage des tailles de contraintes à casser - Analyse expérimentale
+    #shift!(Tctr)
+    #println(Tctr)
+    #println(length(Tctr))
+end
+
+#close(f)
+=#
 
 
+################################################################################
+################################################################################
+################################################################################
+##########################    APPROCHÉE  #######################################
+################################################################################
+################################################################################
+################################################################################
+## ATTENTION DANS CE CAS LÀ, LE DISTANCIER DOIT ÊTRE SYMÉTRIQUE
 
+#Nom = "plat/exemple.dat"
+# Nom = "plat/plat10.dat"
+# Nom = "plat/plat20.dat"
+# Nom = "plat/plat30.dat"
+# Nom = "plat/plat40.dat"
+# Nom = "plat/plat50.dat"
+# Nom = "plat/plat60.dat"
+# Nom = "plat/plat70.dat"
+# Nom = "plat/plat80.dat"
+# Nom = "plat/plat90.dat"
+# Nom = "plat/plat100.dat"
+# Nom = "plat/plat110.dat"
+# Nom = "plat/plat120.dat"
+# Nom = "plat/plat130.dat"
+# Nom = "plat/plat140.dat"
+# Nom = "plat/plat150.dat"
+
+#=
+C = parseTSP(Nom)
+#outfile = Nom*"APP - res.txt"
+# writing to files is very similar:
+#f = open(outfile, "w")
+# both print and println can be used as usual but with f as their first arugment
+    #println(f,"Résolution approchée pour ", Nom ," points à visiter :")
+    println("Résolution approchée pour ", Nom ," points à visiter :")
     ## Création d'une copie de la matrice que l'on va dégrader pour la recherche des plus proches voisins
     X = copy(C)
     ## Point de départ de la recherche
@@ -577,17 +589,19 @@ f = open(outfile, "w")
     P = procheVoisin(X,dep)
     CoutAV = calculCout(C,P)
     @time begin
-    O = opt2(P,dep)
+        O = opt2(P,dep)
     end
     CoutAP = calculCout(C,O)
     ## Variation constatée
-    #println("Cout AV = ", CoutAV)
-    #println("Cout AP = ", CoutAP)
-    println(f,"Cout AV = ", CoutAV)
-    println(f,"Cout AP = ", CoutAP)
+    println("Cout AV = ", CoutAV)
+    println("Cout AP = ", CoutAP)
+    #println(f,"Cout AV = ", CoutAV)
+    #println(f,"Cout AP = ", CoutAP)
     Var =  CoutAP - CoutAV
-    #println("Delta coût : ", Var )
-    println(f,"Delta coût : ", Var )
-    println(f,"Parcours final : ",O)
+    println("Delta coût : ", Var )
+    #println(f,"Delta coût : ", Var )
+    println("Parcours final : ",O)
+    #println(f,"Parcours final : ",O)
 
-close(f)
+#close(f)
+=#

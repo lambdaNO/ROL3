@@ -1,0 +1,77 @@
+
+
+
+
+% Ou en d'autre termes : \newline \\
+% \begin{footnotesize}
+% \textit{ je pars d'un endroit que je ne connais pas, je me dirige vers d'autres endroits que je ne connais pas, et quand je suis bloqué je fais demi-tour jusqu'à retrouver un chemin que je n'ai pas encore parcouru.
+% }
+% \begin{flushright}
+% \underline{zestedesavoir.com - Parcourir un graphe}
+% \end{flushright}
+% \end{footnotesize}
+
+\subsection*{Analyse expérimentale}
+
+%%%%%%%%%%%% PLAT
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+
+
+%%% RELIEF
+
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+
+
+
+
+%%% NB CONTRAINES AJOUTEE ET TAILLE
+
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+
+
+
+
+
+\section{Résolution par méthode approchée}
+\subsection*{Présentation d'un exemple}
+
+\subsection*{Analyse expérimentale}
+
+
+
+
+
+
+
+
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+\begin{table}[]
+\centering
+\label{my-label}
+\begin{tabular}{|l|l|l|l|l|l|l|l|}
+\hline
+\multicolumn{1}{|c|}{\multirow{3}{*}{\textbf{OPT}}} & \multicolumn{1}{c|}{\multirow{3}{*}{\textbf{Coût init}}} & \multicolumn{1}{c|}{\multirow{3}{*}{\textbf{Cout réduit}}} & \multicolumn{1}{c|}{\multirow{3}{*}{\textbf{Delta Coût}}} & \multicolumn{1}{c|}{\multirow{3}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Nb Solutions\\ potentiellement \\ améliorantes\end{tabular}}}} & \multicolumn{1}{c|}{\multirow{3}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Nb \\ Total de \\ Comparaisons\end{tabular}}}} & \multicolumn{1}{c|}{\multirow{3}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Temps machine \\ (secondes)\end{tabular}}}} & \multicolumn{1}{c|}{\multirow{3}{*}{\textbf{CPU}}} \\
+\multicolumn{1}{|c|}{}                              & \multicolumn{1}{c|}{}                                    & \multicolumn{1}{c|}{}                                      & \multicolumn{1}{c|}{}                                     & \multicolumn{1}{c|}{}                                                                                                                 & \multicolumn{1}{c|}{}                                                                                                 & \multicolumn{1}{c|}{}                                                                                              & \multicolumn{1}{c|}{}                              \\
+\multicolumn{1}{|c|}{}                              & \multicolumn{1}{c|}{}                                    & \multicolumn{1}{c|}{}                                      & \multicolumn{1}{c|}{}                                     & \multicolumn{1}{c|}{}                                                                                                                 & \multicolumn{1}{c|}{}                                                                                                 & \multicolumn{1}{c|}{}                                                                                              & \multicolumn{1}{c|}{}                              \\ \hline
+\textbf{Plat 10}                                    & 170                                                      & 170                                                        & 0                                                         & 0                                                                                                                                     & 73                                                                                                                    & 0.057533                                                                                                           & 7.06 k alloc 383.305 KiB                           \\ \hline
+\textbf{Plat 20}                                    & 234                                                      & 230                                                        & 4                                                         & 2                                                                                                                                     & 323                                                                                                                   & 0.050759                                                                                                           & 7.49 k alloc: 402.070 KiB                          \\ \hline
+\textbf{Plat 30}                                    & 311                                                      & 223                                                        & 88                                                        & 8                                                                                                                                     & 243                                                                                                                   & 0.051375                                                                                                           & 9.21 k alloc: 477.180 KiB                          \\ \hline
+\textbf{Plat 40}                                    & 293                                                      & 243                                                        & 50                                                        & 6                                                                                                                                     & 777                                                                                                                   & 0.047224                                                                                                           & 9.06 k alloc 472.305 KiB                           \\ \hline
+\textbf{Plat 50}                                    & 442                                                      & 317                                                        & 125                                                       & 4                                                                                                                                     & 94                                                                                                                    & 0.047263                                                                                                           & 8.68 k alloc: 456.367 KiB                          \\ \hline
+\textbf{Plat 60}                                    & 407                                                      & 277                                                        & 130                                                       & 19                                                                                                                                    & 1026                                                                                                                  & 0.055708                                                                                                           & 15.66 k alloc: 772.211 KiB                         \\ \hline
+\textbf{Plat 70}                                    & 449                                                      & 415                                                        & 34                                                        & 8                                                                                                                                     & 1047                                                                                                                  & 0.049780                                                                                                           & 11.23 k alloc: 573.617 KiB                         \\ \hline
+\textbf{Plat 80}                                    & 511                                                      & 193                                                        & 318                                                       & 10                                                                                                                                    & 1463                                                                                                                  & 0.054752                                                                                                           & 12.87 k alloc: 650.055 KiB                         \\ \hline
+\textbf{Plat 90}                                    & 461                                                      & 391                                                        & 70                                                        & 14                                                                                                                                    & 1653                                                                                                                  & 0.045220                                                                                                           & 16.01 k alloc: 795.805 KiB                         \\ \hline
+\textbf{Plat 100}                                   & 508                                                      & 435                                                        & 73                                                        & 13                                                                                                                                    & 1552                                                                                                                  & 0.050341                                                                                                           & 16.18 k alloc: 806.852 KiB                         \\ \hline
+\textbf{Plat 110}                                   & 462                                                      & 382                                                        & 80                                                        & 21                                                                                                                                    & 2247                                                                                                                  & 0.054896                                                                                                           & 22.97 k alloc: 1.096 MiB                           \\ \hline
+\textbf{Plat 120}                                   & 364                                                      & 305                                                        & 59                                                        & 9                                                                                                                                     & 2574                                                                                                                  & 0.052555                                                                                                           & 14.54 k alloc: 731.992 KiB                         \\ \hline
+\textbf{Plat 130}                                   & 411                                                      & 315                                                        & 96                                                        & 12                                                                                                                                    & 2032                                                                                                                  & 0.051334                                                                                                           & 17.71 k alloc: 880.539 KiB                         \\ \hline
+\textbf{Plat 140}                                   & 379                                                      & 305                                                        & 74                                                        & 4                                                                                                                                     & 3562                                                                                                                  & 0.050174                                                                                                           & 11.02 k alloc: 569.492 KiB                         \\ \hline
+\textbf{Plat 150}                                   & 609                                                      & 537                                                        & 72                                                        & 30                                                                                                                                    & 4704                                                                                                                  & 0.055015                                                                                                           & 37.10 k alloc: 1.745 MiB                           \\ \hline
+\end{tabular}
+\caption{Résultats de l'analyse expérimentale sur les instances de type plat}
+\end{table}

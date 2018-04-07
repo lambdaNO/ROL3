@@ -1,0 +1,152 @@
+Résolution exacte pour plat/plat30.dat points à visiter :
+Résolution d'initiale :  
+> temps total = 124.0
+   Permutations :
+(1 -> 4) (2 -> 12) (3 -> 25) (4 -> 1) (5 -> 8) (6 -> 14) (7 -> 17) (8 -> 5) (9 -> 27) (10 -> 20) (11 -> 18) (12 -> 2) (13 -> 16) (14 -> 6) (15 -> 23) (16 -> 13) (17 -> 7) (18 -> 11) (19 -> 21) (20 -> 10) (21 -> 19) (22 -> 26) (23 -> 15) (24 -> 28) (25 -> 3) (26 -> 22) (27 -> 9) (28 -> 24) (29 -> 30) (30 -> 29) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 4], [2, 12], [3, 25], [5, 8], [6, 14], [7, 17], [9, 27], [10, 20], [11, 18], [13, 16], [15, 23], [19, 21], [22, 26], [24, 28], [29, 30]]
+> Nombre de cycle(s) trouvé(s) : 15
+Itération n° 1 Cassage de contrainte 
+> Cycle à casser : [1, 4]
+> Taille du cycle à casser : 2
+> Nouvelle contrainte : x[1,4] + x[4,1] ≤ 1
+> Nouvelle résolution après ajout de la nouvelle contrainte !
+> temps total = 126.0
+   Permutations :
+(1 -> 4) (2 -> 16) (3 -> 10) (4 -> 25) (5 -> 8) (6 -> 14) (7 -> 17) (8 -> 5) (9 -> 27) (10 -> 20) (11 -> 18) (12 -> 2) (13 -> 21) (14 -> 6) (15 -> 23) (16 -> 13) (17 -> 7) (18 -> 24) (19 -> 1) (20 -> 11) (21 -> 19) (22 -> 26) (23 -> 15) (24 -> 28) (25 -> 3) (26 -> 22) (27 -> 9) (28 -> 12) (29 -> 30) (30 -> 29) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 4, 25, 3, 10, 20, 11, 18, 24, 28, 12, 2, 16, 13, 21, 19], [5, 8], [6, 14], [7, 17], [9, 27], [15, 23], [22, 26], [29, 30]]
+> Nombre de cycle(s) trouvé(s) : 8
+
+Itération n° 2 Cassage de contrainte 
+> Cycle à casser : [5, 8]
+> Taille du cycle à casser : 2
+> Nouvelle contrainte : x[5,8] + x[8,5] ≤ 1
+> Nouvelle résolution après ajout de la nouvelle contrainte !
+> temps total = 127.0
+   Permutations :
+(1 -> 4) (2 -> 16) (3 -> 25) (4 -> 8) (5 -> 26) (6 -> 14) (7 -> 17) (8 -> 5) (9 -> 27) (10 -> 20) (11 -> 7) (12 -> 28) (13 -> 21) (14 -> 6) (15 -> 23) (16 -> 13) (17 -> 12) (18 -> 11) (19 -> 1) (20 -> 10) (21 -> 19) (22 -> 2) (23 -> 15) (24 -> 18) (25 -> 3) (26 -> 22) (27 -> 9) (28 -> 24) (29 -> 30) (30 -> 29) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 4, 8, 5, 26, 22, 2, 16, 13, 21, 19], [3, 25], [6, 14], [7, 17, 12, 28, 24, 18, 11], [9, 27], [10, 20], [15, 23], [29, 30]]
+> Nombre de cycle(s) trouvé(s) : 8
+
+Itération n° 3 Cassage de contrainte 
+> Cycle à casser : [3, 25]
+> Taille du cycle à casser : 2
+> Nouvelle contrainte : x[3,25] + x[25,3] ≤ 1
+> Nouvelle résolution après ajout de la nouvelle contrainte !
+> temps total = 128.0
+   Permutations :
+(1 -> 30) (2 -> 12) (3 -> 25) (4 -> 8) (5 -> 26) (6 -> 14) (7 -> 17) (8 -> 5) (9 -> 27) (10 -> 3) (11 -> 20) (12 -> 28) (13 -> 16) (14 -> 6) (15 -> 23) (16 -> 13) (17 -> 7) (18 -> 11) (19 -> 21) (20 -> 10) (21 -> 19) (22 -> 2) (23 -> 15) (24 -> 18) (25 -> 4) (26 -> 22) (27 -> 9) (28 -> 24) (29 -> 1) (30 -> 29) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 30, 29], [2, 12, 28, 24, 18, 11, 20, 10, 3, 25, 4, 8, 5, 26, 22], [6, 14], [7, 17], [9, 27], [13, 16], [15, 23], [19, 21]]
+> Nombre de cycle(s) trouvé(s) : 8
+
+Itération n° 4 Cassage de contrainte 
+> Cycle à casser : [6, 14]
+> Taille du cycle à casser : 2
+> Nouvelle contrainte : x[6,14] + x[14,6] ≤ 1
+> Nouvelle résolution après ajout de la nouvelle contrainte !
+> temps total = 132.0
+   Permutations :
+(1 -> 19) (2 -> 22) (3 -> 25) (4 -> 1) (5 -> 8) (6 -> 12) (7 -> 17) (8 -> 4) (9 -> 27) (10 -> 3) (11 -> 20) (12 -> 28) (13 -> 16) (14 -> 6) (15 -> 23) (16 -> 2) (17 -> 7) (18 -> 11) (19 -> 21) (20 -> 10) (21 -> 13) (22 -> 26) (23 -> 15) (24 -> 18) (25 -> 14) (26 -> 5) (27 -> 9) (28 -> 24) (29 -> 30) (30 -> 29) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 19, 21, 13, 16, 2, 22, 26, 5, 8, 4], [3, 25, 14, 6, 12, 28, 24, 18, 11, 20, 10], [7, 17], [9, 27], [15, 23], [29, 30]]
+> Nombre de cycle(s) trouvé(s) : 6
+
+Itération n° 5 Cassage de contrainte 
+> Cycle à casser : [7, 17]
+> Taille du cycle à casser : 2
+> Nouvelle contrainte : x[7,17] + x[17,7] ≤ 1
+> Nouvelle résolution après ajout de la nouvelle contrainte !
+> temps total = 133.0
+   Permutations :
+(1 -> 19) (2 -> 22) (3 -> 10) (4 -> 1) (5 -> 8) (6 -> 14) (7 -> 17) (8 -> 4) (9 -> 27) (10 -> 20) (11 -> 7) (12 -> 6) (13 -> 16) (14 -> 25) (15 -> 23) (16 -> 2) (17 -> 28) (18 -> 24) (19 -> 21) (20 -> 11) (21 -> 13) (22 -> 26) (23 -> 15) (24 -> 18) (25 -> 3) (26 -> 5) (27 -> 9) (28 -> 12) (29 -> 30) (30 -> 29) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 19, 21, 13, 16, 2, 22, 26, 5, 8, 4], [3, 10, 20, 11, 7, 17, 28, 12, 6, 14, 25], [9, 27], [15, 23], [18, 24], [29, 30]]
+> Nombre de cycle(s) trouvé(s) : 6
+
+Itération n° 6 Cassage de contrainte 
+> Cycle à casser : [9, 27]
+> Taille du cycle à casser : 2
+> Nouvelle contrainte : x[9,27] + x[27,9] ≤ 1
+> Nouvelle résolution après ajout de la nouvelle contrainte !
+> temps total = 141.0
+   Permutations :
+(1 -> 4) (2 -> 16) (3 -> 25) (4 -> 8) (5 -> 26) (6 -> 12) (7 -> 11) (8 -> 5) (9 -> 27) (10 -> 3) (11 -> 20) (12 -> 28) (13 -> 21) (14 -> 6) (15 -> 23) (16 -> 13) (17 -> 7) (18 -> 24) (19 -> 1) (20 -> 9) (21 -> 19) (22 -> 2) (23 -> 15) (24 -> 18) (25 -> 14) (26 -> 22) (27 -> 10) (28 -> 17) (29 -> 30) (30 -> 29) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 4, 8, 5, 26, 22, 2, 16, 13, 21, 19], [3, 25, 14, 6, 12, 28, 17, 7, 11, 20, 9, 27, 10], [15, 23], [18, 24], [29, 30]]
+> Nombre de cycle(s) trouvé(s) : 5
+
+Itération n° 7 Cassage de contrainte 
+> Cycle à casser : [15, 23]
+> Taille du cycle à casser : 2
+> Nouvelle contrainte : x[15,23] + x[23,15] ≤ 1
+> Nouvelle résolution après ajout de la nouvelle contrainte !
+> temps total = 142.0
+   Permutations :
+(1 -> 15) (2 -> 16) (3 -> 25) (4 -> 8) (5 -> 26) (6 -> 12) (7 -> 11) (8 -> 5) (9 -> 27) (10 -> 3) (11 -> 20) (12 -> 28) (13 -> 21) (14 -> 6) (15 -> 23) (16 -> 13) (17 -> 7) (18 -> 24) (19 -> 1) (20 -> 9) (21 -> 19) (22 -> 2) (23 -> 14) (24 -> 18) (25 -> 4) (26 -> 22) (27 -> 10) (28 -> 17) (29 -> 30) (30 -> 29) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 15, 23, 14, 6, 12, 28, 17, 7, 11, 20, 9, 27, 10, 3, 25, 4, 8, 5, 26, 22, 2, 16, 13, 21, 19], [18, 24], [29, 30]]
+> Nombre de cycle(s) trouvé(s) : 3
+
+Itération n° 8 Cassage de contrainte 
+> Cycle à casser : [18, 24]
+> Taille du cycle à casser : 2
+> Nouvelle contrainte : x[18,24] + x[24,18] ≤ 1
+> Nouvelle résolution après ajout de la nouvelle contrainte !
+> temps total = 143.0
+   Permutations :
+(1 -> 15) (2 -> 16) (3 -> 25) (4 -> 8) (5 -> 26) (6 -> 12) (7 -> 20) (8 -> 5) (9 -> 27) (10 -> 3) (11 -> 18) (12 -> 17) (13 -> 21) (14 -> 6) (15 -> 23) (16 -> 13) (17 -> 7) (18 -> 11) (19 -> 1) (20 -> 9) (21 -> 19) (22 -> 2) (23 -> 14) (24 -> 28) (25 -> 4) (26 -> 22) (27 -> 10) (28 -> 24) (29 -> 30) (30 -> 29) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 15, 23, 14, 6, 12, 17, 7, 20, 9, 27, 10, 3, 25, 4, 8, 5, 26, 22, 2, 16, 13, 21, 19], [11, 18], [24, 28], [29, 30]]
+> Nombre de cycle(s) trouvé(s) : 4
+
+Itération n° 9 Cassage de contrainte 
+> Cycle à casser : [11, 18]
+> Taille du cycle à casser : 2
+> Nouvelle contrainte : x[11,18] + x[18,11] ≤ 1
+> Nouvelle résolution après ajout de la nouvelle contrainte !
+> temps total = 143.0
+   Permutations :
+(1 -> 29) (2 -> 12) (3 -> 25) (4 -> 8) (5 -> 26) (6 -> 14) (7 -> 11) (8 -> 5) (9 -> 27) (10 -> 3) (11 -> 20) (12 -> 6) (13 -> 16) (14 -> 23) (15 -> 1) (16 -> 13) (17 -> 7) (18 -> 24) (19 -> 21) (20 -> 9) (21 -> 19) (22 -> 2) (23 -> 15) (24 -> 28) (25 -> 4) (26 -> 22) (27 -> 10) (28 -> 17) (29 -> 30) (30 -> 18) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 29, 30, 18, 24, 28, 17, 7, 11, 20, 9, 27, 10, 3, 25, 4, 8, 5, 26, 22, 2, 12, 6, 14, 23, 15], [13, 16], [19, 21]]
+> Nombre de cycle(s) trouvé(s) : 3
+
+Itération n° 10 Cassage de contrainte 
+> Cycle à casser : [13, 16]
+> Taille du cycle à casser : 2
+> Nouvelle contrainte : x[13,16] + x[16,13] ≤ 1
+> Nouvelle résolution après ajout de la nouvelle contrainte !
+> temps total = 143.0
+   Permutations :
+(1 -> 29) (2 -> 16) (3 -> 25) (4 -> 8) (5 -> 26) (6 -> 14) (7 -> 11) (8 -> 5) (9 -> 27) (10 -> 3) (11 -> 20) (12 -> 17) (13 -> 6) (14 -> 23) (15 -> 1) (16 -> 13) (17 -> 7) (18 -> 24) (19 -> 21) (20 -> 9) (21 -> 19) (22 -> 2) (23 -> 15) (24 -> 28) (25 -> 4) (26 -> 22) (27 -> 10) (28 -> 12) (29 -> 30) (30 -> 18) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 29, 30, 18, 24, 28, 12, 17, 7, 11, 20, 9, 27, 10, 3, 25, 4, 8, 5, 26, 22, 2, 16, 13, 6, 14, 23, 15], [19, 21]]
+> Nombre de cycle(s) trouvé(s) : 2
+
+Itération n° 11 Cassage de contrainte 
+> Cycle à casser : [19, 21]
+> Taille du cycle à casser : 2
+> Nouvelle contrainte : x[19,21] + x[21,19] ≤ 1
+> Nouvelle résolution après ajout de la nouvelle contrainte !
+> temps total = 144.0
+   Permutations :
+(1 -> 19) (2 -> 22) (3 -> 10) (4 -> 25) (5 -> 8) (6 -> 14) (7 -> 11) (8 -> 4) (9 -> 20) (10 -> 27) (11 -> 18) (12 -> 6) (13 -> 16) (14 -> 23) (15 -> 1) (16 -> 2) (17 -> 12) (18 -> 24) (19 -> 21) (20 -> 7) (21 -> 13) (22 -> 26) (23 -> 15) (24 -> 28) (25 -> 3) (26 -> 5) (27 -> 9) (28 -> 17) (29 -> 30) (30 -> 29) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 19, 21, 13, 16, 2, 22, 26, 5, 8, 4, 25, 3, 10, 27, 9, 20, 7, 11, 18, 24, 28, 17, 12, 6, 14, 23, 15], [29, 30]]
+> Nombre de cycle(s) trouvé(s) : 2
+
+Itération n° 12 Cassage de contrainte 
+> Cycle à casser : [29, 30]
+> Taille du cycle à casser : 2
+> Nouvelle contrainte : x[29,30] + x[30,29] ≤ 1
+> Nouvelle résolution après ajout de la nouvelle contrainte !
+> temps total = 146.0
+   Permutations :
+(1 -> 15) (2 -> 22) (3 -> 10) (4 -> 25) (5 -> 8) (6 -> 12) (7 -> 11) (8 -> 4) (9 -> 27) (10 -> 20) (11 -> 18) (12 -> 17) (13 -> 16) (14 -> 6) (15 -> 23) (16 -> 2) (17 -> 7) (18 -> 30) (19 -> 21) (20 -> 9) (21 -> 13) (22 -> 26) (23 -> 14) (24 -> 28) (25 -> 3) (26 -> 5) (27 -> 19) (28 -> 24) (29 -> 1) (30 -> 29) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 15, 23, 14, 6, 12, 17, 7, 11, 18, 30, 29], [2, 22, 26, 5, 8, 4, 25, 3, 10, 20, 9, 27, 19, 21, 13, 16], [24, 28]]
+> Nombre de cycle(s) trouvé(s) : 3
+
+Itération n° 13 Cassage de contrainte 
+> Cycle à casser : [24, 28]
+> Taille du cycle à casser : 2
+> Nouvelle contrainte : x[24,28] + x[28,24] ≤ 1
+> Nouvelle résolution après ajout de la nouvelle contrainte !
+> temps total = 147.0
+   Permutations :
+(1 -> 29) (2 -> 22) (3 -> 10) (4 -> 25) (5 -> 8) (6 -> 14) (7 -> 11) (8 -> 4) (9 -> 27) (10 -> 20) (11 -> 7) (12 -> 6) (13 -> 16) (14 -> 23) (15 -> 1) (16 -> 2) (17 -> 12) (18 -> 24) (19 -> 21) (20 -> 9) (21 -> 13) (22 -> 26) (23 -> 15) (24 -> 28) (25 -> 3) (26 -> 5) (27 -> 19) (28 -> 17) (29 -> 30) (30 -> 18) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 29, 30, 18, 24, 28, 17, 12, 6, 14, 23, 15], [2, 22, 26, 5, 8, 4, 25, 3, 10, 20, 9, 27, 19, 21, 13, 16], [7, 11]]
+> Nombre de cycle(s) trouvé(s) : 3
+
+Itération n° 14 Cassage de contrainte 
+> Cycle à casser : [7, 11]
+> Taille du cycle à casser : 2
+> Nouvelle contrainte : x[7,11] + x[11,7] ≤ 1
+> Nouvelle résolution après ajout de la nouvelle contrainte !
+> temps total = 148.0
+   Permutations :
+(1 -> 15) (2 -> 16) (3 -> 10) (4 -> 25) (5 -> 8) (6 -> 12) (7 -> 17) (8 -> 4) (9 -> 20) (10 -> 27) (11 -> 7) (12 -> 22) (13 -> 21) (14 -> 6) (15 -> 23) (16 -> 13) (17 -> 28) (18 -> 30) (19 -> 26) (20 -> 11) (21 -> 19) (22 -> 2) (23 -> 14) (24 -> 18) (25 -> 3) (26 -> 5) (27 -> 9) (28 -> 24) (29 -> 1) (30 -> 29) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 15, 23, 14, 6, 12, 22, 2, 16, 13, 21, 19, 26, 5, 8, 4, 25, 3, 10, 27, 9, 20, 11, 7, 17, 28, 24, 18, 30, 29]]
+> Nombre de cycle(s) trouvé(s) : 1
+
+FIN - Problème résolu :
+> temps total = 148.0
+> Nombre d'itération nécéssaires : 15
+> Nombre de contraintes ajoutées : 14
+> Ordre de parcours des drônes : 
+1 -> 15 -> 23 -> 14 -> 6 -> 12 -> 22 -> 2 -> 16 -> 13 -> 21 -> 19 -> 26 -> 5 -> 8 -> 4 -> 25 -> 3 -> 10 -> 27 -> 9 -> 20 -> 11 -> 7 -> 17 -> 28 -> 24 -> 18 -> 30 -> 29 -> 1. 

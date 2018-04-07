@@ -1,0 +1,13 @@
+Résolution approchée pour plat/plat10.dat points à visiter :
+Proches voisins 
+P : [1, 3, 5, 8, 7, 6, 4, 10, 2, 9, 1]
+Parcours de base :
+[3, 9, 5, 10, 8, 4, 6, 7, 1, 2]
+Coût de base :
+170
+##################
+Nombre de solutions potentiellement améliorantes détectées : 0
+Cout AV = 170
+Cout AP = 170
+Delta coût : 0
+Parcours final : [3, 9, 5, 10, 8, 4, 6, 7, 1, 2]

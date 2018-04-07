@@ -1,0 +1,33 @@
+Résolution approchée pour plat/plat20.dat points à visiter :
+Proches voisins 
+P : [1, 9, 15, 13, 4, 19, 20, 10, 5, 8, 14, 3, 18, 12, 11, 2, 7, 6, 16, 17, 1]
+Parcours de base :
+[9, 7, 18, 19, 8, 16, 6, 14, 15, 5, 2, 11, 4, 3, 13, 17, 1, 12, 20, 10]
+Coût de base :
+234
+##################
+#########################################################################################
+Δ < 0 trouvé : 
+           Δ((i = 1, j = 9);(i' = 16, j' = 17) = -4
+           Parcours initial : [9, 7, 18, 19, 8, 16, 6, 14, 15, 5, 2, 11, 4, 3, 13, 17, 1, 12, 20, 10]
+           Parcours modifié : [16, 7, 18, 19, 8, 16, 6, 14, 17, 5, 2, 11, 4, 3, 13, 9, 1, 12, 20, 10]
+           Coût init 234 - Coût modif 235
+           Variation de coût : 1
+           > Coût supérieur obtenu avec ce nouveau parcours -> Solution non améliorante.
+           Parcours retourné : [9, 7, 18, 19, 8, 16, 6, 14, 15, 5, 2, 11, 4, 3, 13, 17, 1, 12, 20, 10]
+#########################################################################################
+#########################################################################################
+Δ < 0 trouvé : 
+           Δ((i = 16, j = 17);(i' = 1, j' = 9) = -4
+           Parcours initial : [9, 7, 18, 19, 8, 16, 6, 14, 15, 5, 2, 11, 4, 3, 13, 17, 1, 12, 20, 10]
+           Parcours modifié : [17, 7, 18, 19, 8, 16, 6, 14, 15, 5, 2, 11, 4, 3, 13, 1, 9, 12, 20, 10]
+           Coût init 234 - Coût modif 230
+           Variation de coût : -4
+           > Coût inférieur obtenu avec ce nouveau parcours -> Solution améliorante.
+           Parcours retourné : [17, 7, 18, 19, 8, 16, 6, 14, 15, 5, 2, 11, 4, 3, 13, 1, 9, 12, 20, 10]
+#########################################################################################
+Nombre de solutions potentiellement améliorantes détectées : 2
+Cout AV = 234
+Cout AP = 230
+Delta coût : -4
+Parcours final : [17, 7, 18, 19, 8, 16, 6, 14, 15, 5, 2, 11, 4, 3, 13, 1, 9, 12, 20, 10]

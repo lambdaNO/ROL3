@@ -1,0 +1,32 @@
+Résolution exacte pour relief/relief10.dat points à visiter :
+Résolution d'initiale :  
+> temps total = 189.0
+   Permutations :
+(1 -> 6) (2 -> 8) (3 -> 7) (4 -> 10) (5 -> 2) (6 -> 9) (7 -> 3) (8 -> 5) (9 -> 4) (10 -> 1) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 6, 9, 4, 10], [2, 8, 5], [3, 7]]
+> Nombre de cycle(s) trouvé(s) : 3
+Itération n° 1 Cassage de contrainte 
+> Cycle à casser : [3, 7]
+> Taille du cycle à casser : 2
+> Nouvelle contrainte : x[3,7] + x[7,3] ≤ 1
+> Nouvelle résolution après ajout de la nouvelle contrainte !
+> temps total = 198.0
+   Permutations :
+(1 -> 6) (2 -> 5) (3 -> 8) (4 -> 10) (5 -> 2) (6 -> 7) (7 -> 9) (8 -> 3) (9 -> 4) (10 -> 1) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 6, 7, 9, 4, 10], [2, 5], [3, 8]]
+> Nombre de cycle(s) trouvé(s) : 3
+
+Itération n° 2 Cassage de contrainte 
+> Cycle à casser : [2, 5]
+> Taille du cycle à casser : 2
+> Nouvelle contrainte : x[2,5] + x[5,2] ≤ 1
+> Nouvelle résolution après ajout de la nouvelle contrainte !
+> temps total = 198.0
+   Permutations :
+(1 -> 6) (2 -> 10) (3 -> 8) (4 -> 7) (5 -> 2) (6 -> 9) (7 -> 3) (8 -> 5) (9 -> 4) (10 -> 1) > Cycle(s) trouvé(s) : Array{Int64,1}[[1, 6, 9, 4, 7, 3, 8, 5, 2, 10]]
+> Nombre de cycle(s) trouvé(s) : 1
+
+FIN - Problème résolu :
+> temps total = 198.0
+> Nombre d'itération nécéssaires : 3
+> Nombre de contraintes ajoutées : 2
+> Ordre de parcours des drônes : 
+1 -> 6 -> 9 -> 4 -> 7 -> 3 -> 8 -> 5 -> 2 -> 10 -> 1. 
